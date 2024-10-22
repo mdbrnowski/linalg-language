@@ -8,17 +8,15 @@ WHITESPACE: [ \t\r\n]+ -> skip;
 
 COMMENT: '#' ~[\r\n]* -> skip;
 
-PLUS      : '+';
-MINUS     : '-';
-MULTIPLY  : '*';
-DIVIDE    : '/';
-BINARY_OP : PLUS | MINUS | MULTIPLY | DIVIDE;
+PLUS     : '+';
+MINUS    : '-';
+MULTIPLY : '*';
+DIVIDE   : '/';
 
-MAT_PLUS      : '.+';
-MAT_MINUS     : '.-';
-MAT_MULTIPLY  : '.*';
-MAT_DIVIDE    : './';
-BINARY_MAT_OP : MAT_PLUS | MAT_MINUS | MAT_MULTIPLY | MAT_DIVIDE;
+MAT_PLUS     : '.+';
+MAT_MINUS    : '.-';
+MAT_MULTIPLY : '.*';
+MAT_DIVIDE   : './';
 
 MAT_TRANSPOSE_OP: '\'';
 
@@ -27,20 +25,13 @@ ASSIGN_PLUS     : '+=';
 ASSIGN_MINUS    : '-=';
 ASSIGN_MULTIPLY : '*=';
 ASSIGN_DIVIDE   : '/=';
-ASSIGN_OP:
-    ASSIGN
-    | ASSIGN_PLUS
-    | ASSIGN_MINUS
-    | ASSIGN_MULTIPLY
-    | ASSIGN_DIVIDE;
 
-LE          : '<';
-GE          : '>';
-EQ          : '==';
-NE          : '!=';
-LEQ         : '<=';
-GEQ         : '>=';
-RELATION_OP : LE | GE | EQ | NE | LEQ | GEQ;
+LE  : '<';
+GE  : '>';
+EQ  : '==';
+NE  : '!=';
+LEQ : '<=';
+GEQ : '>=';
 
 OPEN_BRACKET_ROUND   : '(';
 CLOSE_BRACKET_ROUND  : ')';
