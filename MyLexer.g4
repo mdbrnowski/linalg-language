@@ -1,6 +1,5 @@
-// $antlr-format alignTrailingComments true, columnLimit 140, maxEmptyLinesToKeep 1, reflowComments false
-// $antlr-format useTab false, allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0
-// $antlr-format alignSemicolons ownLine, alignColons trailing, singleLineOverrulesHangingColon true
+// $antlr-format columnLimit 100, useTab false, minEmptyLines 0
+// $antlr-format alignSemicolons none, alignColons trailing
 // $antlr-format alignLexerCommands true, alignLabels true, alignTrailers true
 
 lexer grammar MyLexer;
@@ -28,7 +27,12 @@ ASSIGN_PLUS     : '+=';
 ASSIGN_MINUS    : '-=';
 ASSIGN_MULTIPLY : '*=';
 ASSIGN_DIVIDE   : '/=';
-ASSIGN_OP       : ASSIGN | ASSIGN_PLUS | ASSIGN_MINUS | ASSIGN_MULTIPLY | ASSIGN_DIVIDE;
+ASSIGN_OP:
+    ASSIGN
+    | ASSIGN_PLUS
+    | ASSIGN_MINUS
+    | ASSIGN_MULTIPLY
+    | ASSIGN_DIVIDE;
 
 LE          : '<';
 GE          : '>';
