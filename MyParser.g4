@@ -26,8 +26,8 @@ codeBlock
 
 ifElse
     : IF OPEN_BRACKET_ROUND comparison CLOSE_BRACKET_ROUND codeBlock (
-        ELSE IF OPEN_BRACKET_ROUND comparison CLOSE_BRACKET_ROUND codeBlock
-    )* (ELSE codeBlock)?
+        ELSE codeBlock
+    )?
     ;
 
 forLoop
