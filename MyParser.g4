@@ -52,7 +52,6 @@ assignment
 
 print
     : PRINT expression (COMMA expression)* SEMICOLON
-    | PRINT STRING SEMICOLON
     ;
 
 return
@@ -73,6 +72,7 @@ expression
     | ID
     | INT
     | FLOAT
+    | STRING
     | matrixElementReference
     | vector
     | matrix
