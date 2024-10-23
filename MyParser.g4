@@ -73,6 +73,7 @@ expression
     | INT
     | FLOAT
     | STRING
+    | vectorElementReference
     | matrixElementReference
     | vector
     | matrix
@@ -96,6 +97,10 @@ vector
 
 matrixElementReference
     : ID OPEN_BRACKET_SQUARE INT COMMA INT CLOSE_BRACKET_SQUARE
+    ;
+
+vectorElementReference
+    : ID OPEN_BRACKET_SQUARE INT CLOSE_BRACKET_SQUARE
     ;
 
 assignmentOperator
