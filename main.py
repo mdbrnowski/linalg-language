@@ -10,7 +10,17 @@ def pretty_lexer(string: str):
 
     for token in lexer.getAllTokens():
         token_name = lexer.ruleNames[token.type - 1]
-        print(f'({token.line}): {token_name}({token.text})')
+        print(f"({token.line}): {token_name}({token.text})")
+
+
+def _print_tree(node, parser, level=0):
+    if node.getChildCount() == 0:
+        print(" | " * level + str(node))
+    else:
+        rule_name = parser.ruleNames[node.getRuleIndex()]
+        print(" | " * level + rule_name)
+        for i in range(node.getChildCount()):
+            _print_tree(node.getChild(i), parser, level + 1)
 
 
 def pretty_parser(string: str):
@@ -19,21 +29,21 @@ def pretty_parser(string: str):
     parser = MyParser(stream)
 
     tree = parser.program()
-    print(tree.toStringTree(recog=parser))  # todo: pretty print
+    _print_tree(tree, parser)
 
 
 def main(action: str, filename: str):
 
-    with open(filename, encoding='utf-8') as f:
+    with open(filename, encoding="utf-8") as f:
         string = f.read()
 
-    if action == 'lexer':
+    if action == "lexer":
         pretty_lexer(string)
-    elif action == 'parser':
+    elif action == "parser":
         pretty_parser(string)
     else:
-        print('Invalid action')
+        print("Invalid action")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     typer.run(main)
