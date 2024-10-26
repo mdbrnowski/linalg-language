@@ -4,8 +4,15 @@ from antlr4 import *
 from generated.MyLexer import MyLexer
 from generated.MyParser import MyParser
 
+app = typer.Typer(no_args_is_help=True)
 
-def pretty_lexer(string: str):
+
+@app.command()
+def lex(filename: str):
+    """Lexical analysis"""
+    with open(filename, encoding="utf-8") as f:
+        string = f.read()
+
     lexer = MyLexer(InputStream(string))
 
     for token in lexer.getAllTokens():
@@ -23,7 +30,12 @@ def _print_tree(node, parser, level=0):
             _print_tree(node.getChild(i), parser, level + 1)
 
 
-def pretty_parser(string: str):
+@app.command()
+def parse(filename: str):
+    """Syntactic analysis"""
+    with open(filename, encoding="utf-8") as f:
+        string = f.read()
+
     lexer = MyLexer(InputStream(string))
     stream = CommonTokenStream(lexer)
     parser = MyParser(stream)
@@ -32,18 +44,5 @@ def pretty_parser(string: str):
     _print_tree(tree, parser)
 
 
-def main(action: str, filename: str):
-
-    with open(filename, encoding="utf-8") as f:
-        string = f.read()
-
-    if action == "lexer":
-        pretty_lexer(string)
-    elif action == "parser":
-        pretty_parser(string)
-    else:
-        print("Invalid action")
-
-
 if __name__ == "__main__":
-    typer.run(main)
+    app()
