@@ -62,10 +62,10 @@ expression
     : OPEN_BRACKET_ROUND expression CLOSE_BRACKET_ROUND
     | MINUS expression
     | expression MAT_TRANSPOSE_OP
-    | expression binaryMultOperator expression
-    | expression binaryAddOperator expression
-    | expression binaryMatMultOperator expression
-    | expression binaryMatAddOperator expression
+    | expression op = (MULTIPLY | DIVIDE) expression
+    | expression op = (PLUS | MINUS) expression
+    | expression op = (MAT_MULTIPLY | MAT_DIVIDE) expression
+    | expression op = (MAT_PLUS | MAT_MINUS) expression
     | ZEROS OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
     | ONES OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
     | EYE OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
@@ -118,24 +118,4 @@ relationOperator
     | NE
     | LEQ
     | GEQ
-    ;
-
-binaryMultOperator
-    : MULTIPLY
-    | DIVIDE
-    ;
-
-binaryAddOperator
-    : PLUS
-    | MINUS
-    ;
-
-binaryMatMultOperator
-    : MAT_MULTIPLY
-    | MAT_DIVIDE
-    ;
-
-binaryMatAddOperator
-    : MAT_PLUS
-    | MAT_MINUS
     ;
