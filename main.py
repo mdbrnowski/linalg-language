@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import typer
-from antlr4 import *
+from antlr4 import InputStream, CommonTokenStream
 from generated.MyLexer import MyLexer
 from generated.MyParser import MyParser
 
