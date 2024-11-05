@@ -1,6 +1,6 @@
 # LinAlg Language
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![actions status](https://github.com/mdbrnowski/linalg-language/actions/workflows/test.yml/badge.svg)](https://github.com/mdbrnowski/linalg-language/actions)
 
 To generate lexer and parser in Python, run
 
