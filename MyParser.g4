@@ -47,7 +47,7 @@ comparison
     ;
 
 assignment
-    : (ID | matrixElementReference) assignmentOperator expression SEMICOLON
+    : (ID | vectorElementReference | matrixElementReference) assignmentOperator expression SEMICOLON
     ;
 
 print
@@ -63,8 +63,8 @@ expression
     | MINUS expression
     | expression MAT_TRANSPOSE_OP
     | expression op = (MULTIPLY | DIVIDE) expression
-    | expression op = (PLUS | MINUS) expression
     | expression op = (MAT_MULTIPLY | MAT_DIVIDE) expression
+    | expression op = (PLUS | MINUS) expression
     | expression op = (MAT_PLUS | MAT_MINUS) expression
     | ZEROS OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
     | ONES OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
