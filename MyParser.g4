@@ -47,7 +47,7 @@ comparison
     ;
 
 assignment
-    : (ID | vectorElementReference | matrixElementReference) assignmentOperator expression SEMICOLON
+    : (ID | elementReference) assignmentOperator expression SEMICOLON
     ;
 
 print
@@ -66,17 +66,18 @@ expression
     | expression op = (MAT_MULTIPLY | MAT_DIVIDE) expression
     | expression op = (PLUS | MINUS) expression
     | expression op = (MAT_PLUS | MAT_MINUS) expression
-    | ZEROS OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
-    | ONES OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
-    | EYE OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
+    | specialMatrixFunction
     | ID
     | INT
     | FLOAT
     | STRING
-    | vectorElementReference
-    | matrixElementReference
+    | elementReference
+    | elementReference
     | vector
-    | matrix
+    ;
+
+specialMatrixFunction
+    : (ZEROS | ONES | EYE) OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
     ;
 
 break
@@ -87,20 +88,12 @@ continue
     : CONTINUE SEMICOLON
     ;
 
-matrix
-    : OPEN_BRACKET_SQUARE vector (COMMA vector)* CLOSE_BRACKET_SQUARE
-    ;
-
 vector
     : OPEN_BRACKET_SQUARE expression (COMMA expression)* CLOSE_BRACKET_SQUARE
     ;
 
-matrixElementReference
-    : ID OPEN_BRACKET_SQUARE INT COMMA INT CLOSE_BRACKET_SQUARE
-    ;
-
-vectorElementReference
-    : ID OPEN_BRACKET_SQUARE INT CLOSE_BRACKET_SQUARE
+elementReference
+    : ID OPEN_BRACKET_SQUARE INT (COMMA INT)* CLOSE_BRACKET_SQUARE
     ;
 
 assignmentOperator
