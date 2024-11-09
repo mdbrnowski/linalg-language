@@ -43,6 +43,7 @@ def parse(filename: str):
 
     parser.program()
 
+
 @app.command()
 def ast(filename: str):
     """Abstract syntax tree"""
@@ -54,8 +55,9 @@ def ast(filename: str):
     parser = MyParser(stream)
 
     tree = parser.program()
-    listener = ASTListener()
-    ParseTreeWalker().walk(listener, tree)
+    if parser.getNumberOfSyntaxErrors() == 0:
+        listener = ASTListener()
+        ParseTreeWalker().walk(listener, tree)
 
 
 if __name__ == "__main__":
