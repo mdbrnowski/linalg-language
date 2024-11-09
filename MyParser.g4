@@ -72,7 +72,6 @@ expression
     | float
     | string
     | elementReference
-    | elementReference
     | vector
     ;
 
