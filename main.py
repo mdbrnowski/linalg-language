@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import typer
-from antlr4 import InputStream, CommonTokenStream
+from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
 from generated.MyLexer import MyLexer
 from generated.MyParser import MyParser
+from ast_listener import ASTListener
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -40,8 +41,21 @@ def parse(filename: str):
     stream = CommonTokenStream(lexer)
     parser = MyParser(stream)
 
+    parser.program()
+
+@app.command()
+def ast(filename: str):
+    """Abstract syntax tree"""
+    with open(filename, encoding="utf-8") as f:
+        string = f.read()
+
+    lexer = MyLexer(InputStream(string))
+    stream = CommonTokenStream(lexer)
+    parser = MyParser(stream)
+
     tree = parser.program()
-    _print_tree(tree, parser)
+    listener = ASTListener()
+    ParseTreeWalker().walk(listener, tree)
 
 
 if __name__ == "__main__":
