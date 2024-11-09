@@ -31,7 +31,7 @@ ifElse
     ;
 
 forLoop
-    : FOR ID ASSIGN range codeBlock
+    : FOR id ASSIGN range codeBlock
     ;
 
 range
@@ -47,7 +47,7 @@ comparison
     ;
 
 assignment
-    : (ID | elementReference) assignmentOperator expression SEMICOLON
+    : (id | elementReference) assignmentOperator expression SEMICOLON
     ;
 
 print
@@ -67,17 +67,17 @@ expression
     | expression op = (PLUS | MINUS) expression
     | expression op = (MAT_PLUS | MAT_MINUS) expression
     | specialMatrixFunction
-    | ID
-    | INT
-    | FLOAT
-    | STRING
+    | id
+    | int
+    | float
+    | string
     | elementReference
     | elementReference
     | vector
     ;
 
 specialMatrixFunction
-    : (ZEROS | ONES | EYE) OPEN_BRACKET_ROUND INT CLOSE_BRACKET_ROUND
+    : (ZEROS | ONES | EYE) OPEN_BRACKET_ROUND int CLOSE_BRACKET_ROUND
     ;
 
 break
@@ -93,7 +93,7 @@ vector
     ;
 
 elementReference
-    : ID OPEN_BRACKET_SQUARE INT (COMMA INT)* CLOSE_BRACKET_SQUARE
+    : id OPEN_BRACKET_SQUARE int (COMMA int)* CLOSE_BRACKET_SQUARE
     ;
 
 assignmentOperator
@@ -111,4 +111,20 @@ relationOperator
     | NE
     | LEQ
     | GEQ
+    ;
+
+id
+    : ID
+    ;
+
+int
+    : INT
+    ;
+
+float
+    : FLOAT
+    ;
+
+string
+    : STRING
     ;
