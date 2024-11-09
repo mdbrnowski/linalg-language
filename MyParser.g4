@@ -59,20 +59,20 @@ return
     ;
 
 expression
-    : OPEN_BRACKET_ROUND expression CLOSE_BRACKET_ROUND
-    | MINUS expression
-    | expression MAT_TRANSPOSE_OP
-    | expression op = (MULTIPLY | DIVIDE) expression
-    | expression op = (MAT_MULTIPLY | MAT_DIVIDE) expression
-    | expression op = (PLUS | MINUS) expression
-    | expression op = (MAT_PLUS | MAT_MINUS) expression
-    | specialMatrixFunction
-    | id
-    | int
-    | float
-    | string
-    | elementReference
-    | vector
+    : OPEN_BRACKET_ROUND expression CLOSE_BRACKET_ROUND      # parenthesesExpression
+    | MINUS expression                                       # minusExpression
+    | expression MAT_TRANSPOSE_OP                            # transposeExpression
+    | expression op = (MULTIPLY | DIVIDE) expression         # binaryExpression
+    | expression op = (MAT_MULTIPLY | MAT_DIVIDE) expression # binaryExpression
+    | expression op = (PLUS | MINUS) expression              # binaryExpression
+    | expression op = (MAT_PLUS | MAT_MINUS) expression      # binaryExpression
+    | specialMatrixFunction                                  # singleExpression
+    | id                                                     # singleExpression
+    | int                                                    # singleExpression
+    | float                                                  # singleExpression
+    | string                                                 # singleExpression
+    | elementReference                                       # singleExpression
+    | vector                                                 # singleExpression
     ;
 
 specialMatrixFunction
