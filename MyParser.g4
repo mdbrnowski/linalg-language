@@ -14,7 +14,7 @@ program
 
 codeBlock
     : OPEN_BRACKET_CURLY (codeBlock)* CLOSE_BRACKET_CURLY
-    | ifElse
+    | ifThenElse
     | forLoop
     | whileLoop
     | assignment
@@ -24,10 +24,20 @@ codeBlock
     | continue
     ;
 
-ifElse
-    : IF OPEN_BRACKET_ROUND comparison CLOSE_BRACKET_ROUND codeBlock (
-        ELSE codeBlock
-    )?
+ifThenElse
+    : if then else?
+    ;
+
+if
+    : IF OPEN_BRACKET_ROUND comparison CLOSE_BRACKET_ROUND
+    ;
+
+then
+    : codeBlock
+    ;
+
+else
+    : ELSE codeBlock
     ;
 
 forLoop
