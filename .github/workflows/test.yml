@@ -18,7 +18,9 @@ jobs:
           python-version: '3.12'
       - name: Ruff linter
         uses: astral-sh/ruff-action@v1
+        with:
+          args: "check --exclude generated/"
       - name: Ruff format check
         uses: astral-sh/ruff-action@v1
         with:
-          args: "format --check"
+          args: "format --check --exclude generated/"
