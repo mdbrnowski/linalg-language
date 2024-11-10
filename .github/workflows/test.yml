@@ -16,5 +16,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Ruff
+      - name: Ruff linter
         uses: astral-sh/ruff-action@v1
+      - name: Ruff format check
+        uses: astral-sh/ruff-action@v1
+        with:
+          args: "format --check"
