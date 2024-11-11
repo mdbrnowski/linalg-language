@@ -17,11 +17,10 @@ jobs:
       - name: Install Python and the package
         run: |
           uv python install
-          uv tool install ruff
           uv sync --all-extras --dev
       - name: Ruff linter
-        run: uv run ruff check
+        run: uvx ruff check
       - name: Ruff formatter
-        run: uv run ruff format --check
-      # - name: Run tests
-        # run: uv run pytest tests
+        run: uvx ruff format --check
+      - name: Run tests
+        run: uv run pytest
