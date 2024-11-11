@@ -1,0 +1,13 @@
+[project]
+name = "linalg-language"
+version = "0.1.0"
+description = "A simple language for linear algebra."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "antlr4-python3-runtime>=4.13.2",
+    "typer>=0.13.0",
+]
+
+[tool.ruff]
+exclude = ["generated"]
