@@ -1,0 +1,27 @@
+A = zeros(5);  # 3x3 matrix filled with zeros
+B = ones(7);   # 3x3 matrix filled with ones
+C = eye(10);   # 3x3 diagonal matrix filled with ones
+D = A.+B;     # add element-wise
+E -= A.-B;    # substract element-wise
+F *= A.*B;    # multiply element-wise
+G /= A./B;    # divide element-wise
+
+H = [ [ 1, 2, 3], [ 4, 5, 6], [ 7, 8, 9] ];
+
+print H[1, 2];
+
+float_1 = 3.14;
+float_2 = 3.;
+float_3 = .14;
+float_4 = 3.14e-2;
+string_1 = "#Hello!";
+
+H *= H';
+
+a = 1;
+b = 2;
+
+a += b;
+a /= b;
+a *= b;
+a -= b;
