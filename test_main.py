@@ -1,3 +1,4 @@
+import pytest
 from typer.testing import CliRunner
 from main import app
 
@@ -27,9 +28,10 @@ def test_parser_error():
     assert result.stdout.count("line") == 5
 
 
-def test_ast():
-    result = runner.invoke(app, ["ast", "tests/ast/input_1.txt"])
+@pytest.mark.parametrize("n", [1, 2, 3])
+def test_ast(n):
+    result = runner.invoke(app, ["ast", f"tests/ast/input_{n}.txt"])
     assert result.exit_code == 0
-    with open("tests/ast/output_1.txt", encoding="utf-8") as f:
+    with open(f"tests/ast/output_{n}.txt", encoding="utf-8") as f:
         output = f.read()
     assert result.stdout == output

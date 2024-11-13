@@ -1,0 +1,8 @@
+n = 10;
+for i = 0:n {
+    j = i;
+    while (i > 0)
+        i -= 1;
+    if (i == 0)
+        print "OK";
+}
