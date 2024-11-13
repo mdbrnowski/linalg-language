@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!.venv/bin/python3
 import typer
 from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
 from generated.MyLexer import MyLexer
