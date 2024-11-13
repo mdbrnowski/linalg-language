@@ -21,16 +21,6 @@ def lex(filename: str):
         print(f"({token.line}): {token_name}({token.text})")
 
 
-def _print_tree(node, parser, level=0):
-    if node.getChildCount() == 0:
-        print(" | " * level + str(node))
-    else:
-        rule_name = parser.ruleNames[node.getRuleIndex()]
-        print(" | " * level + rule_name)
-        for i in range(node.getChildCount()):
-            _print_tree(node.getChild(i), parser, level + 1)
-
-
 @app.command()
 def parse(filename: str):
     """Syntactic analysis"""
