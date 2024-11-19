@@ -86,7 +86,8 @@ expression
     ;
 
 specialMatrixFunction
-    : (ZEROS | ONES | EYE) OPEN_BRACKET_ROUND int CLOSE_BRACKET_ROUND
+    : EYE OPEN_BRACKET_ROUND int CLOSE_BRACKET_ROUND
+    | (ZEROS | ONES) OPEN_BRACKET_ROUND int (COMMA int)* CLOSE_BRACKET_ROUND
     ;
 
 break
