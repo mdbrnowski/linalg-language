@@ -92,8 +92,8 @@ expression
     ;
 
 specialMatrixFunction
-    : EYE OPEN_BRACKET_ROUND int CLOSE_BRACKET_ROUND
-    | (ZEROS | ONES) OPEN_BRACKET_ROUND int (COMMA int)* CLOSE_BRACKET_ROUND
+    : EYE OPEN_BRACKET_ROUND expression CLOSE_BRACKET_ROUND
+    | (ZEROS | ONES) OPEN_BRACKET_ROUND expression (COMMA expression)* CLOSE_BRACKET_ROUND
     ;
 
 break
@@ -109,7 +109,7 @@ vector
     ;
 
 elementReference
-    : id OPEN_BRACKET_SQUARE int (COMMA int)* CLOSE_BRACKET_SQUARE
+    : id OPEN_BRACKET_SQUARE expression (COMMA expression)* CLOSE_BRACKET_SQUARE
     ;
 
 id
