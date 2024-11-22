@@ -53,11 +53,17 @@ whileLoop
     ;
 
 comparison
-    : expression relationOperator expression
+    : expression (LE | GE | EQ | NE | LEQ | GEQ) expression
     ;
 
 assignment
-    : (id | elementReference) assignmentOperator expression SEMICOLON
+    : (id | elementReference) (
+        ASSIGN
+        | ASSIGN_PLUS
+        | ASSIGN_MINUS
+        | ASSIGN_MULTIPLY
+        | ASSIGN_DIVIDE
+    ) expression SEMICOLON
     ;
 
 print
@@ -104,23 +110,6 @@ vector
 
 elementReference
     : id OPEN_BRACKET_SQUARE int (COMMA int)* CLOSE_BRACKET_SQUARE
-    ;
-
-assignmentOperator
-    : ASSIGN
-    | ASSIGN_PLUS
-    | ASSIGN_MINUS
-    | ASSIGN_MULTIPLY
-    | ASSIGN_DIVIDE
-    ;
-
-relationOperator
-    : LE
-    | GE
-    | EQ
-    | NE
-    | LEQ
-    | GEQ
     ;
 
 id

@@ -215,24 +215,6 @@ class MyParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MyParser#assignmentOperator.
-    def enterAssignmentOperator(self, ctx:MyParser.AssignmentOperatorContext):
-        pass
-
-    # Exit a parse tree produced by MyParser#assignmentOperator.
-    def exitAssignmentOperator(self, ctx:MyParser.AssignmentOperatorContext):
-        pass
-
-
-    # Enter a parse tree produced by MyParser#relationOperator.
-    def enterRelationOperator(self, ctx:MyParser.RelationOperatorContext):
-        pass
-
-    # Exit a parse tree produced by MyParser#relationOperator.
-    def exitRelationOperator(self, ctx:MyParser.RelationOperatorContext):
-        pass
-
-
     # Enter a parse tree produced by MyParser#id.
     def enterId(self, ctx:MyParser.IdContext):
         pass
