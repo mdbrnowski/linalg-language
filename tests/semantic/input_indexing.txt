@@ -1,0 +1,7 @@
+A = zeros(3, 5);
+B = A[0];
+C = B[0];
+D = A[0, 0];
+E = D[0];        # wrong, D is an integer
+F = A[0, 0, 0];  # algo wrong
+G = A[1.0];      # also wrong

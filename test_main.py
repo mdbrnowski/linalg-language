@@ -86,3 +86,23 @@ def test_sem_error_special_matrix():
     assert "line 1" in result.stdout
     assert "line 11" in result.stdout
     assert result.stdout.count("line") == 2
+
+
+def test_sem_error_indexing():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_indexing.txt"])
+    assert result.exit_code == 0
+    assert "line 5" in result.stdout
+    assert "line 6" in result.stdout
+    assert "line 7" in result.stdout
+    assert result.stdout.count("line") == 3
+
+
+def test_sem_error_binary_operations():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_binary_operations.txt"])
+    assert result.exit_code == 0
+    assert "line 7" in result.stdout
+    assert "line 8" in result.stdout
+    assert "line 14" in result.stdout
+    assert "line 16" in result.stdout
+    assert "line 17" in result.stdout
+    assert result.stdout.count("line") == 5

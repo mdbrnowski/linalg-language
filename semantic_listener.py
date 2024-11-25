@@ -84,11 +84,36 @@ class SemanticListener(MyParserListener):
                 )
             self.variables[ctx.getChild(0).getText()] = self.expr_type[ctx.getChild(2)]
 
-    def enterBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
-        pass
-
     def exitBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
-        pass
+        first = ctx.getChild(0)
+        second = ctx.getChild(2)
+        type_1 = self.expr_type[first]
+        type_2 = self.expr_type[second]
+        if ctx.op.type in [
+            MyParser.PLUS,
+            MyParser.MINUS,
+            MyParser.MULTIPLY,
+            MyParser.DIVIDE,
+        ]:
+            if {type_1, type_2} == {Type.INT}:
+                self.expr_type[ctx] = Type.INT
+            elif {type_1, type_2} <= {Type.FLOAT, Type.INT}:
+                self.expr_type[ctx] = Type.FLOAT
+            else:
+                ctx.parser.notifyErrorListeners(
+                    "Incompatible types in a binary operation",
+                    ctx.getChild(1).getSymbol(),
+                )
+                self.expr_type[ctx] = None
+        else:
+            if type_1 == type_2:
+                self.expr_type[ctx] = type_1
+            else:
+                ctx.parser.notifyErrorListeners(
+                    "Incompatible types in a matrix binary operation",
+                    ctx.getChild(1).getSymbol(),
+                )
+                self.expr_type[ctx] = None
 
     def exitParenthesesExpression(self, ctx: MyParser.ParenthesesExpressionContext):
         self.expr_type[ctx] = self.expr_type[ctx.getChild(1)]
@@ -121,7 +146,7 @@ class SemanticListener(MyParserListener):
                     "Matrix dimentions must be integers", ctx.getChild(0).getSymbol()
                 )
                 self.expr_type[ctx] = None
-                break
+                return
         type_dimentions = []
         for dim in dimentions:
             if isinstance(dim, MyParser.SingleExpressionContext) and isinstance(
@@ -140,7 +165,8 @@ class SemanticListener(MyParserListener):
                 ctx.parser.notifyErrorListeners(
                     "Inconsistent types in a vector", wrong_token.getSymbol()
                 )
-                break
+                self.expr_type[ctx] = None
+                return
         elem_type = self.expr_type[elements[1]]
         if isinstance(elem_type, Type):
             self.expr_type[ctx] = (elem_type, len(elements))
@@ -151,13 +177,34 @@ class SemanticListener(MyParserListener):
                 *elem_type[1:],
             )
 
-    def enterElementReference(self, ctx: MyParser.ElementReferenceContext):
-        pass
-
     def exitElementReference(self, ctx: MyParser.ElementReferenceContext):
-        pass
+        references = ctx.children[2::2]
+        for ref in references:
+            if self.expr_type[ref] != Type.INT:
+                ctx.parser.notifyErrorListeners(
+                    "Indices must be integers", ctx.getChild(1).getSymbol()
+                )
+                self.expr_type[ctx] = None
+                return
+        id_type = self.expr_type[ctx.getChild(0)]
+        if not isinstance(id_type, tuple):
+            ctx.parser.notifyErrorListeners(
+                "Indexing can only be applied to tensors", ctx.getChild(1).getSymbol()
+            )
+            self.expr_type[ctx] = None
+            return
+        if len(references) > len(id_type) - 1:
+            ctx.parser.notifyErrorListeners(
+                "Too many indices", ctx.getChild(1).getSymbol()
+            )
+            self.expr_type[ctx] = None
+            return
+        if len(references) < len(id_type) - 1:
+            self.expr_type[ctx] = (id_type[0], *id_type[1 + len(references) :])
+        else:
+            self.expr_type[ctx] = id_type[0]
 
-    def enterId(self, ctx: MyParser.IdContext):
+    def exitId(self, ctx: MyParser.IdContext):
         if ctx.getText() not in self.variables:
             ctx.parser.notifyErrorListeners(
                 f"Variable {ctx.getText()} not declared", ctx.ID().getSymbol()
@@ -166,11 +213,11 @@ class SemanticListener(MyParserListener):
         else:
             self.expr_type[ctx] = self.variables[ctx.getText()]
 
-    def enterInt(self, ctx: MyParser.IntContext):
+    def exitInt(self, ctx: MyParser.IntContext):
         self.expr_type[ctx] = Type.INT
 
-    def enterFloat(self, ctx: MyParser.FloatContext):
+    def exitFloat(self, ctx: MyParser.FloatContext):
         self.expr_type[ctx] = Type.FLOAT
 
-    def enterString(self, ctx: MyParser.StringContext):
+    def exitString(self, ctx: MyParser.StringContext):
         self.expr_type[ctx] = Type.STRING
