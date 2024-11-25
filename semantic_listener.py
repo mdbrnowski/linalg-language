@@ -15,7 +15,6 @@ class SemanticListener(MyParserListener):
     """Checks break and continue statements, variable declarations,types and assignments."""
 
     def __init__(self):
-        # super().__init__()
         self.nested_loop_counter = 0
         self.variables: dict[str, Type | None] = {}
         self.expr_type: dict[
@@ -114,11 +113,24 @@ class SemanticListener(MyParserListener):
     def exitSingleExpression(self, ctx: MyParser.SingleExpressionContext):
         self.expr_type[ctx] = self.expr_type[ctx.getChild(0)]
 
-    def enterSpecialMatrixFunction(self, ctx: MyParser.SpecialMatrixFunctionContext):
-        pass
-
     def exitSpecialMatrixFunction(self, ctx: MyParser.SpecialMatrixFunctionContext):
-        pass
+        dimentions = ctx.children[2::2]
+        for dim in dimentions:
+            if self.expr_type[dim] != Type.INT:
+                ctx.parser.notifyErrorListeners(
+                    "Matrix dimentions must be integers", ctx.getChild(0).getSymbol()
+                )
+                self.expr_type[ctx] = None
+                break
+        type_dimentions = []
+        for dim in dimentions:
+            if isinstance(dim, MyParser.SingleExpressionContext) and isinstance(
+                dim.getChild(0), MyParser.IntContext
+            ):
+                type_dimentions.append(int(dim.getText()))
+            else:
+                type_dimentions.append(None)
+        self.expr_type[ctx] = (Type.INT, *type_dimentions)
 
     def exitVector(self, ctx: MyParser.VectorContext):
         elements = ctx.children[1::2]

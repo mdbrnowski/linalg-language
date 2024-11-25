@@ -78,3 +78,11 @@ def test_sem_error_transpose():
     assert "line 7" in result.stdout
     assert "transpose" in result.stdout.lower()
     assert result.stdout.count("line") == 1
+
+
+def test_sem_error_special_matrix():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_special_matrix.txt"])
+    assert result.exit_code == 0
+    assert "line 1" in result.stdout
+    assert "line 11" in result.stdout
+    assert result.stdout.count("line") == 2
