@@ -60,7 +60,16 @@ def test_sem_error_vector():
     assert "line 3" in result.stdout
     assert "line 7" in result.stdout
     assert result.stdout.count("line") == 3
-    assert result.stdout.count("vector") == 3
+    assert result.stdout.lower().count("vector") == 3
+
+
+def test_sem_error_variables():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_variables.txt"])
+    assert result.exit_code == 0
+    assert "line 5" in result.stdout
+    assert "line 7" in result.stdout
+    assert result.stdout.count("line") == 2
+    assert result.stdout.lower().count("variable") == 2
 
 
 def test_sem_error_transpose():

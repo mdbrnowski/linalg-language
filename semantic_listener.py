@@ -8,6 +8,7 @@ class Type(Enum):
     INT = auto()
     FLOAT = auto()
     STRING = auto()
+    TBD = auto()  # to be determined (only during assignment)
 
 
 class SemanticListener(MyParserListener):
@@ -68,15 +69,20 @@ class SemanticListener(MyParserListener):
             and ctx.getChild(0).getText() not in self.variables
         ):
             # type is unknown at this point
-            self.variables[ctx.getChild(0).getText()] = None
+            self.variables[ctx.getChild(0).getText()] = Type.TBD
 
     def exitAssignment(self, ctx: MyParser.AssignmentContext):
         if (
             ctx.getChild(1).symbol.type == MyParser.ASSIGN
             and isinstance(ctx.getChild(0), MyParser.IdContext)
-            and self.variables[ctx.getChild(0).getText()] is None
+            and self.variables[ctx.getChild(0).getText()] is Type.TBD
         ):
             # we finally know the type
+            if self.expr_type[ctx.getChild(2)] is Type.TBD:
+                ctx.parser.notifyErrorListeners(
+                    "Using a variable while declaring it is not allowed",
+                    ctx.getChild(1).getSymbol(),
+                )
             self.variables[ctx.getChild(0).getText()] = self.expr_type[ctx.getChild(2)]
 
     def enterBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
@@ -141,7 +147,9 @@ class SemanticListener(MyParserListener):
 
     def enterId(self, ctx: MyParser.IdContext):
         if ctx.getText() not in self.variables:
-            ctx.parser.notifyErrorListeners(f"Variable {ctx.getText()} not declared")
+            ctx.parser.notifyErrorListeners(
+                f"Variable {ctx.getText()} not declared", ctx.ID().getSymbol()
+            )
             self.expr_type[ctx] = None
         else:
             self.expr_type[ctx] = self.variables[ctx.getText()]
