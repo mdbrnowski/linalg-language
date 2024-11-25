@@ -61,3 +61,11 @@ def test_sem_error_vector():
     assert "line 7" in result.stdout
     assert result.stdout.count("line") == 3
     assert result.stdout.count("vector") == 3
+
+
+def test_sem_error_transpose():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_transpose.txt"])
+    assert result.exit_code == 0
+    assert "line 7" in result.stdout
+    assert "transpose" in result.stdout.lower()
+    assert result.stdout.count("line") == 1

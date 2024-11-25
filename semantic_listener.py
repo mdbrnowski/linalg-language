@@ -1,7 +1,7 @@
 from enum import Enum, auto
+from antlr4 import ParserRuleContext
 from generated.MyParser import MyParser
 from generated.MyParserListener import MyParserListener
-from antlr4 import ParserRuleContext
 
 
 class Type(Enum):
@@ -13,9 +13,15 @@ class Type(Enum):
 class SemanticListener(MyParserListener):
     """Checks break and continue statements, variable declarations,types and assignments."""
 
-    # LOOP CHECKING
+    def __init__(self):
+        # super().__init__()
+        self.nested_loop_counter = 0
+        self.variables: dict[str, Type | None] = {}
+        self.expr_type: dict[
+            ParserRuleContext, Type | tuple
+        ] = {}  # values are either Type or (Type, int | None, int | None, ...)
 
-    nested_loop_counter = 0
+    # LOOP CHECKING
 
     def enterForLoop(self, ctx: MyParser.ForLoopContext):
         self.nested_loop_counter += 1
@@ -43,11 +49,6 @@ class SemanticListener(MyParserListener):
 
     # VARIABLES & TYPES CHECKING
 
-    variables: dict[str, Type] = {}
-    expr_type: dict[
-        ParserRuleContext, Type | tuple
-    ] = {}  # values are either Type or (Type, int, int, ...)
-
     def enterRange(self, ctx: MyParser.RangeContext):
         pass
 
@@ -61,10 +62,22 @@ class SemanticListener(MyParserListener):
         pass
 
     def enterAssignment(self, ctx: MyParser.AssignmentContext):
-        pass
+        if (
+            ctx.getChild(1).symbol.type == MyParser.ASSIGN
+            and isinstance(ctx.getChild(0), MyParser.IdContext)
+            and ctx.getChild(0).getText() not in self.variables
+        ):
+            # type is unknown at this point
+            self.variables[ctx.getChild(0).getText()] = None
 
     def exitAssignment(self, ctx: MyParser.AssignmentContext):
-        pass
+        if (
+            ctx.getChild(1).symbol.type == MyParser.ASSIGN
+            and isinstance(ctx.getChild(0), MyParser.IdContext)
+            and self.variables[ctx.getChild(0).getText()] is None
+        ):
+            # we finally know the type
+            self.variables[ctx.getChild(0).getText()] = self.expr_type[ctx.getChild(2)]
 
     def enterBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
         pass
@@ -75,11 +88,19 @@ class SemanticListener(MyParserListener):
     def exitParenthesesExpression(self, ctx: MyParser.ParenthesesExpressionContext):
         self.expr_type[ctx] = self.expr_type[ctx.getChild(1)]
 
-    def enterTransposeExpression(self, ctx: MyParser.TransposeExpressionContext):
-        pass
-
     def exitTransposeExpression(self, ctx: MyParser.TransposeExpressionContext):
-        pass
+        matrix = ctx.getChild(0)
+        if (  # is a matrix
+            isinstance(self.expr_type[matrix], tuple)
+            and len(self.expr_type[matrix]) == 3
+        ):
+            self.expr_type[ctx] = tuple(self.expr_type[matrix][i] for i in (0, 2, 1))
+        else:
+            ctx.parser.notifyErrorListeners(
+                "Transpose operator can only be applied to matrices",
+                ctx.getChild(1).getSymbol(),
+            )
+            self.expr_type[ctx] = self.expr_type[matrix]
 
     def exitMinusExpression(self, ctx: MyParser.MinusExpressionContext):
         self.expr_type[ctx] = self.expr_type[ctx.getChild(1)]
@@ -119,7 +140,11 @@ class SemanticListener(MyParserListener):
         pass
 
     def enterId(self, ctx: MyParser.IdContext):
-        pass
+        if ctx.getText() not in self.variables:
+            ctx.parser.notifyErrorListeners(f"Variable {ctx.getText()} not declared")
+            self.expr_type[ctx] = None
+        else:
+            self.expr_type[ctx] = self.variables[ctx.getText()]
 
     def enterInt(self, ctx: MyParser.IntContext):
         self.expr_type[ctx] = Type.INT
