@@ -11,6 +11,12 @@ class Type(Enum):
     TBD = auto()  # to be determined (only during assignment)
 
 
+def is_plain_integer(ctx: ParserRuleContext) -> bool:
+    return isinstance(ctx, MyParser.SingleExpressionContext) and isinstance(
+        ctx.getChild(0), MyParser.IntContext
+    )
+
+
 class SemanticListener(MyParserListener):
     """Checks break and continue statements, variable declarations,types and assignments."""
 
@@ -149,9 +155,7 @@ class SemanticListener(MyParserListener):
                 return
         type_dimentions = []
         for dim in dimentions:
-            if isinstance(dim, MyParser.SingleExpressionContext) and isinstance(
-                dim.getChild(0), MyParser.IntContext
-            ):
+            if is_plain_integer(dim):
                 type_dimentions.append(int(dim.getText()))
             else:
                 type_dimentions.append(None)
@@ -193,16 +197,23 @@ class SemanticListener(MyParserListener):
             )
             self.expr_type[ctx] = None
             return
-        if len(references) > len(id_type) - 1:
+        elif len(references) > len(id_type) - 1:
             ctx.parser.notifyErrorListeners(
                 "Too many indices", ctx.getChild(1).getSymbol()
             )
             self.expr_type[ctx] = None
             return
-        if len(references) < len(id_type) - 1:
+        elif len(references) < len(id_type) - 1:
             self.expr_type[ctx] = (id_type[0], *id_type[1 + len(references) :])
         else:
             self.expr_type[ctx] = id_type[0]
+
+        for i, ref in enumerate(references):
+            if is_plain_integer(ref) and id_type[i + 1] is not None:
+                if int(ref.getText()) >= id_type[i + 1]:
+                    ctx.parser.notifyErrorListeners(
+                        "Index out of bounds", ctx.getChild(1).getSymbol()
+                    )
 
     def exitId(self, ctx: MyParser.IdContext):
         if ctx.getText() not in self.variables:
