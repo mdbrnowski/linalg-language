@@ -1,6 +1,6 @@
 A = zeros(5);  # 3x3 matrix filled with zeros
-B = ones(7);   # 3x3 matrix filled with ones
-C = eye(10);   # 3x3 diagonal matrix filled with ones
+B = ones(5);   # 3x3 matrix filled with ones
+C = eye(5);   # 3x3 diagonal matrix filled with ones
 D = A.+B;     # add element-wise
 E -= A.-B;    # substract element-wise
 F *= A.*B;    # multiply element-wise
