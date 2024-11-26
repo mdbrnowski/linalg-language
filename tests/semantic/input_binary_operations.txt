@@ -1,0 +1,17 @@
+a1 = 1;
+a2 = 2;
+
+print a1 + a2;
+
+B = zeros(2);
+print a1 + B;
+print a1 .+ B;
+
+C = ones(2);
+print B .+ C;
+
+D = eye(3);
+print B .+ D;
+
+print 2 + "not ok";
+print 2 .+ "not ok";

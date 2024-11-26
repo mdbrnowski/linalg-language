@@ -4,6 +4,7 @@ from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
 from generated.MyLexer import MyLexer
 from generated.MyParser import MyParser
 from ast_listener import ASTListener
+from semantic_listener import SemanticListener
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -47,6 +48,22 @@ def ast(filename: str):
     tree = parser.program()
     if parser.getNumberOfSyntaxErrors() == 0:
         listener = ASTListener()
+        ParseTreeWalker().walk(listener, tree)
+
+
+@app.command()
+def sem(filename: str):
+    """Semantic analysis"""
+    with open(filename, encoding="utf-8") as f:
+        string = f.read()
+
+    lexer = MyLexer(InputStream(string))
+    stream = CommonTokenStream(lexer)
+    parser = MyParser(stream)
+
+    tree = parser.program()
+    if parser.getNumberOfSyntaxErrors() == 0:
+        listener = SemanticListener()
         ParseTreeWalker().walk(listener, tree)
 
 

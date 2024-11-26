@@ -1,0 +1,12 @@
+a = 1;
+b = 2;
+c = "c";
+d = "d";
+if (a < b)
+    print a;
+if (a < c)
+    print c;
+if (c < d)
+    print c;
+if (c == d)
+    print "ok";

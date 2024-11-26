@@ -35,3 +35,91 @@ def test_ast(n):
     with open(f"tests/ast/output_{n}.txt", encoding="utf-8") as f:
         output = f.read()
     assert result.stdout == output
+
+
+def test_sem_error_break():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_break.txt"])
+    assert result.exit_code == 0
+    assert "line 1" in result.stdout
+    assert "break" in result.stdout.lower()
+    assert result.stdout.count("line") == 1
+
+
+def test_sem_error_continue():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_continue.txt"])
+    assert result.exit_code == 0
+    assert "line 1" in result.stdout
+    assert "continue" in result.stdout.lower()
+    assert result.stdout.count("line") == 1
+
+
+def test_sem_error_vector():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_vector.txt"])
+    assert result.exit_code == 0
+    assert "line 1" in result.stdout
+    assert "line 3" in result.stdout
+    assert "line 7" in result.stdout
+    assert result.stdout.count("line") == 3
+    assert result.stdout.lower().count("vector") == 3
+
+
+def test_sem_error_variables():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_variables.txt"])
+    assert result.exit_code == 0
+    assert "line 5" in result.stdout
+    assert "line 7" in result.stdout
+    assert result.stdout.count("line") == 2
+    assert result.stdout.lower().count("variable") == 2
+
+
+def test_sem_error_transpose():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_transpose.txt"])
+    assert result.exit_code == 0
+    assert "line 7" in result.stdout
+    assert "transpose" in result.stdout.lower()
+    assert result.stdout.count("line") == 1
+
+
+def test_sem_error_special_matrix():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_special_matrix.txt"])
+    assert result.exit_code == 0
+    assert "line 1" in result.stdout
+    assert "line 11" in result.stdout
+    assert result.stdout.count("line") == 2
+
+
+def test_sem_error_indexing():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_indexing.txt"])
+    assert result.exit_code == 0
+    assert "line 5" in result.stdout
+    assert "line 6" in result.stdout
+    assert "line 7" in result.stdout
+    assert result.stdout.count("line") == 3
+
+
+def test_sem_error_indexing_bounds():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_indexing_bounds.txt"])
+    assert result.exit_code == 0
+    assert "line 4" in result.stdout
+    assert "line 11" in result.stdout
+    assert "line 12" in result.stdout
+    assert result.stdout.count("line") == 3
+
+
+def test_sem_error_binary_operations():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_binary_operations.txt"])
+    assert result.exit_code == 0
+    assert "line 7" in result.stdout
+    assert "line 8" in result.stdout
+    assert "line 14" in result.stdout
+    assert "line 16" in result.stdout
+    assert "line 17" in result.stdout
+    assert result.stdout.count("line") == 5
+
+
+def test_sem_error_comparisons():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_comparisons.txt"])
+    assert result.exit_code == 0
+    assert "line 7" in result.stdout
+    assert "line 9" in result.stdout
+    assert result.stdout.count("line") == 2
