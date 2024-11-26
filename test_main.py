@@ -115,3 +115,11 @@ def test_sem_error_binary_operations():
     assert "line 16" in result.stdout
     assert "line 17" in result.stdout
     assert result.stdout.count("line") == 5
+
+
+def test_sem_error_comparisons():
+    result = runner.invoke(app, ["sem", "tests/semantic/input_comparisons.txt"])
+    assert result.exit_code == 0
+    assert "line 7" in result.stdout
+    assert "line 9" in result.stdout
+    assert result.stdout.count("line") == 2

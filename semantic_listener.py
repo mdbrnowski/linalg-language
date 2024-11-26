@@ -65,7 +65,18 @@ class SemanticListener(MyParserListener):
         pass
 
     def exitComparison(self, ctx: MyParser.ComparisonContext):
-        pass
+        children_types = {self.expr_type[ctx.getChild(i)] for i in [0, 2]}
+        if not (
+            children_types <= {Type.INT, Type.FLOAT}
+            or (
+                ctx.getChild(1).symbol.type in {MyParser.EQ, MyParser.NE}
+                and children_types <= {Type.STRING}
+            )
+        ):
+            ctx.parser.notifyErrorListeners(
+                "Incompatible types in a comparison", ctx.getChild(1).getSymbol()
+            )
+            self.expr_type[ctx] = None
 
     def enterAssignment(self, ctx: MyParser.AssignmentContext):
         if (
