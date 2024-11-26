@@ -1,3 +1,9 @@
-.antlr/
+# Editor
 .vscode/
+.antlr/
+
+# Python
 __pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
