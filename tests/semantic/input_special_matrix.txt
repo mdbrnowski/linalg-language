@@ -9,3 +9,5 @@ C = zeros(2, n);
 m = 3.14;
 
 D = eye(m);
+
+print eye(3) .+ ones(3, 3) .+ zeros(3, 3);
