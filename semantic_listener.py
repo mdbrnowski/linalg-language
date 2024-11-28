@@ -170,7 +170,11 @@ class SemanticListener(MyParserListener):
                 type_dimentions.append(int(dim.getText()))
             else:
                 type_dimentions.append(None)
-        self.expr_type[ctx] = (Type.INT, *type_dimentions)
+        if ctx.getChild(0).symbol.type == MyParser.EYE:
+            assert len(type_dimentions) == 1
+            self.expr_type[ctx] = (Type.INT, type_dimentions[0], type_dimentions[0])
+        else:
+            self.expr_type[ctx] = (Type.INT, *type_dimentions)
 
     def exitVector(self, ctx: MyParser.VectorContext):
         elements = ctx.children[1::2]
