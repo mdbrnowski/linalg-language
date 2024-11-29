@@ -50,6 +50,7 @@ class SemanticListener(MyParserListener):
 
     def enterForLoop(self, ctx: MyParser.ForLoopContext):
         self.nested_loop_counter += 1
+        self.variables[ctx.getChild(1).getText()] = Type.INT
 
     def exitForLoop(self, ctx: MyParser.ForLoopContext):
         self.nested_loop_counter -= 1
@@ -74,14 +75,13 @@ class SemanticListener(MyParserListener):
 
     # VARIABLES & TYPES CHECKING
 
-    def enterRange(self, ctx: MyParser.RangeContext):
-        pass
-
     def exitRange(self, ctx: MyParser.RangeContext):
-        pass
-
-    def enterComparison(self, ctx: MyParser.ComparisonContext):
-        pass
+        children_types = {self.expr_type[ctx.getChild(i)] for i in [0, 2]}
+        if children_types != {Type.INT}:
+            ctx.parser.notifyErrorListeners(
+                "Range bounds must be integers", ctx.getChild(1).getSymbol()
+            )
+            self.expr_type[ctx] = None
 
     def exitComparison(self, ctx: MyParser.ComparisonContext):
         children_types = {self.expr_type[ctx.getChild(i)] for i in [0, 2]}
