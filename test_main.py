@@ -5,19 +5,14 @@ from main import app
 runner = CliRunner()
 
 
-def test_parser_basic():
-    result = runner.invoke(app, ["parse", "tests/parser/input_1.txt"])
+@pytest.mark.parametrize("n", [1, 2])
+def test_parser(n: int):
+    result = runner.invoke(app, ["parse", f"tests/parser/input_{n}.txt"])
     assert result.exit_code == 0
     assert result.stdout == ""
 
 
-def test_parser_loops():
-    result = runner.invoke(app, ["parse", "tests/parser/input_2.txt"])
-    assert result.exit_code == 0
-    assert result.stdout == ""
-
-
-def test_parser_error():
+def test_parser_errors():
     result = runner.invoke(app, ["parse", "tests/parser/invalid_input_1.txt"])
     assert result.exit_code == 0
     assert "line 1" in result.stdout
@@ -29,7 +24,7 @@ def test_parser_error():
 
 
 @pytest.mark.parametrize("n", [1, 2, 3])
-def test_ast(n):
+def test_ast(n: int):
     result = runner.invoke(app, ["ast", f"tests/ast/input_{n}.txt"])
     assert result.exit_code == 0
     with open(f"tests/ast/output_{n}.txt", encoding="utf-8") as f:
@@ -80,57 +75,20 @@ def test_sem_error_transpose():
     assert result.stdout.count("line") == 1
 
 
-def test_sem_error_special_matrix():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_special_matrix.txt"])
+@pytest.mark.parametrize(
+    "name,line_numbers",
+    [
+        ("special_matrix", [1, 11]),
+        ("indexing", [5, 6, 7]),
+        ("indexing_bounds", [4, 11, 12]),
+        ("binary_operations", [7, 8, 14, 16, 17]),
+        ("comparisons", [7, 9]),
+        ("compound_assignments", [10, 11, 12]),
+    ],
+)
+def test_sem_errors(name: str, line_numbers: list):
+    result = runner.invoke(app, ["sem", f"tests/semantic/input_{name}.txt"])
     assert result.exit_code == 0
-    assert "line 1" in result.stdout
-    assert "line 11" in result.stdout
-    assert result.stdout.count("line") == 2
-
-
-def test_sem_error_indexing():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_indexing.txt"])
-    assert result.exit_code == 0
-    assert "line 5" in result.stdout
-    assert "line 6" in result.stdout
-    assert "line 7" in result.stdout
-    assert result.stdout.count("line") == 3
-
-
-def test_sem_error_indexing_bounds():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_indexing_bounds.txt"])
-    assert result.exit_code == 0
-    assert "line 4" in result.stdout
-    assert "line 11" in result.stdout
-    assert "line 12" in result.stdout
-    assert result.stdout.count("line") == 3
-
-
-def test_sem_error_binary_operations():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_binary_operations.txt"])
-    assert result.exit_code == 0
-    assert "line 7" in result.stdout
-    assert "line 8" in result.stdout
-    assert "line 14" in result.stdout
-    assert "line 16" in result.stdout
-    assert "line 17" in result.stdout
-    assert result.stdout.count("line") == 5
-
-
-def test_sem_error_comparisons():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_comparisons.txt"])
-    assert result.exit_code == 0
-    assert "line 7" in result.stdout
-    assert "line 9" in result.stdout
-    assert result.stdout.count("line") == 2
-
-
-def test_sem_error_compound_assignments():
-    result = runner.invoke(
-        app, ["sem", "tests/semantic/input_compound_assignments.txt"]
-    )
-    assert result.exit_code == 0
-    assert "line 10" in result.stdout
-    assert "line 11" in result.stdout
-    assert "line 12" in result.stdout
-    assert result.stdout.count("line") == 3
+    for ln in line_numbers:
+        assert f"line {ln}" in result.stdout
+    assert result.stdout.lower().count("line") == len(line_numbers)
