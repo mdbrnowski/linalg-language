@@ -17,6 +17,25 @@ def is_plain_integer(ctx: ParserRuleContext) -> bool:
     )
 
 
+def get_resulting_type(
+    type_1: Type | tuple | None, operator: int, type_2: Type | tuple | None
+) -> Type | tuple | None:
+    if operator in [
+        MyParser.PLUS,
+        MyParser.MINUS,
+        MyParser.MULTIPLY,
+        MyParser.DIVIDE,
+    ]:
+        if {type_1, type_2} == {Type.INT}:
+            return Type.INT
+        if {type_1, type_2} <= {Type.FLOAT, Type.INT}:
+            return Type.FLOAT
+    else:
+        if type_1 == type_2:
+            return type_1
+    return None
+
+
 class SemanticListener(MyParserListener):
     """Checks break and continue statements, variable declarations,types and assignments."""
 
@@ -24,8 +43,8 @@ class SemanticListener(MyParserListener):
         self.nested_loop_counter = 0
         self.variables: dict[str, Type | None] = {}
         self.expr_type: dict[
-            ParserRuleContext, Type | tuple
-        ] = {}  # values are either Type or (Type, int | None, int | None, ...)
+            ParserRuleContext, Type | tuple | None
+        ] = {}  # values should be either Type or (Type, int | None, int | None, ...)
 
     # LOOP CHECKING
 
@@ -100,38 +119,36 @@ class SemanticListener(MyParserListener):
                 self.variables[var] = self.expr_type[ctx.getChild(2)]
 
     def exitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
-        pass
+        type_1 = self.expr_type[ctx.getChild(0)]
+        type_2 = self.expr_type[ctx.getChild(2)]
+        operator = {
+            MyParser.ASSIGN_PLUS: MyParser.PLUS,
+            MyParser.ASSIGN_MINUS: MyParser.MINUS,
+            MyParser.ASSIGN_MULTIPLY: MyParser.MULTIPLY,
+            MyParser.ASSIGN_DIVIDE: MyParser.DIVIDE,
+        }[ctx.getChild(1).symbol.type]
+        resulting_type = get_resulting_type(type_1, operator, type_2)
+        if resulting_type is None:
+            ctx.parser.notifyErrorListeners(
+                "Incompatible types in a compound assignment",
+                ctx.getChild(1).getSymbol(),
+            )
+        elif resulting_type is not type_1:
+            ctx.parser.notifyErrorListeners(
+                "Cannot change type in a compound assignment",
+                ctx.getChild(1).getSymbol(),
+            )
 
     def exitBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
-        first = ctx.getChild(0)
-        second = ctx.getChild(2)
-        type_1 = self.expr_type[first]
-        type_2 = self.expr_type[second]
-        if ctx.op.type in [
-            MyParser.PLUS,
-            MyParser.MINUS,
-            MyParser.MULTIPLY,
-            MyParser.DIVIDE,
-        ]:
-            if {type_1, type_2} == {Type.INT}:
-                self.expr_type[ctx] = Type.INT
-            elif {type_1, type_2} <= {Type.FLOAT, Type.INT}:
-                self.expr_type[ctx] = Type.FLOAT
-            else:
-                ctx.parser.notifyErrorListeners(
-                    "Incompatible types in a binary operation",
-                    ctx.getChild(1).getSymbol(),
-                )
-                self.expr_type[ctx] = None
-        else:
-            if type_1 == type_2:
-                self.expr_type[ctx] = type_1
-            else:
-                ctx.parser.notifyErrorListeners(
-                    "Incompatible types in a matrix binary operation",
-                    ctx.getChild(1).getSymbol(),
-                )
-                self.expr_type[ctx] = None
+        type_1 = self.expr_type[ctx.getChild(0)]
+        type_2 = self.expr_type[ctx.getChild(2)]
+        operator = ctx.op.type
+        self.expr_type[ctx] = get_resulting_type(type_1, operator, type_2)
+        if self.expr_type[ctx] is None:
+            ctx.parser.notifyErrorListeners(
+                "Incompatible types in a binary operation",
+                ctx.getChild(1).getSymbol(),
+            )
 
     def exitParenthesesExpression(self, ctx: MyParser.ParenthesesExpressionContext):
         self.expr_type[ctx] = self.expr_type[ctx.getChild(1)]
