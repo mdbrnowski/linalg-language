@@ -46,6 +46,7 @@ def test_ast(n: int):
         ("binary_operations", [7, 8, 14, 16, 17], "binary operation"),
         ("comparisons", [7, 9], "comparison"),
         ("compound_assignments", [10, 11, 12], "assignment"),
+        ("ranges", [9], "range"),
     ],
 )
 def test_sem_errors(name: str, line_numbers: list[int], additional: str):

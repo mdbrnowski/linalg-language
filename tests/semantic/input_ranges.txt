@@ -1,0 +1,10 @@
+for i = 1:4
+    print i;
+
+n = 10;
+for j = 1:n
+    print j;
+
+m = 2.0;
+for k = 1:m
+    print k;

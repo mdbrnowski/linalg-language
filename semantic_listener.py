@@ -37,7 +37,7 @@ def get_resulting_type(
 
 
 class SemanticListener(MyParserListener):
-    """Checks break and continue statements, variable declarations,types and assignments."""
+    """Checks break and continue statements, variable declarations, types, assignments, etc."""
 
     def __init__(self):
         self.nested_loop_counter = 0
@@ -46,42 +46,26 @@ class SemanticListener(MyParserListener):
             ParserRuleContext, Type | tuple | None
         ] = {}  # values should be either Type or (Type, int | None, int | None, ...)
 
-    # LOOP CHECKING
-
     def enterForLoop(self, ctx: MyParser.ForLoopContext):
         self.nested_loop_counter += 1
+        self.variables[ctx.getChild(1).getText()] = Type.INT
 
     def exitForLoop(self, ctx: MyParser.ForLoopContext):
         self.nested_loop_counter -= 1
+
+    def exitRange(self, ctx: MyParser.RangeContext):
+        children_types = {self.expr_type[ctx.getChild(i)] for i in [0, 2]}
+        if children_types != {Type.INT}:
+            ctx.parser.notifyErrorListeners(
+                "Range bounds must be integers", ctx.getChild(1).getSymbol()
+            )
+            self.expr_type[ctx] = None
 
     def enterWhileLoop(self, ctx: MyParser.WhileLoopContext):
         self.nested_loop_counter += 1
 
     def exitWhileLoop(self, ctx: MyParser.WhileLoopContext):
         self.nested_loop_counter -= 1
-
-    def enterBreak(self, ctx: MyParser.BreakContext):
-        if self.nested_loop_counter == 0:
-            ctx.parser.notifyErrorListeners(
-                "Break statement outside of loop", ctx.BREAK().getSymbol()
-            )
-
-    def enterContinue(self, ctx: MyParser.ContinueContext):
-        if self.nested_loop_counter == 0:
-            ctx.parser.notifyErrorListeners(
-                "Continue statement outside of loop", ctx.CONTINUE().getSymbol()
-            )
-
-    # VARIABLES & TYPES CHECKING
-
-    def enterRange(self, ctx: MyParser.RangeContext):
-        pass
-
-    def exitRange(self, ctx: MyParser.RangeContext):
-        pass
-
-    def enterComparison(self, ctx: MyParser.ComparisonContext):
-        pass
 
     def exitComparison(self, ctx: MyParser.ComparisonContext):
         children_types = {self.expr_type[ctx.getChild(i)] for i in [0, 2]}
@@ -193,6 +177,18 @@ class SemanticListener(MyParserListener):
             self.expr_type[ctx] = (Type.INT, type_dimentions[0], type_dimentions[0])
         else:
             self.expr_type[ctx] = (Type.INT, *type_dimentions)
+
+    def enterBreak(self, ctx: MyParser.BreakContext):
+        if self.nested_loop_counter == 0:
+            ctx.parser.notifyErrorListeners(
+                "Break statement outside of loop", ctx.BREAK().getSymbol()
+            )
+
+    def enterContinue(self, ctx: MyParser.ContinueContext):
+        if self.nested_loop_counter == 0:
+            ctx.parser.notifyErrorListeners(
+                "Continue statement outside of loop", ctx.CONTINUE().getSymbol()
+            )
 
     def exitVector(self, ctx: MyParser.VectorContext):
         elements = ctx.children[1::2]
