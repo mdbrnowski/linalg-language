@@ -32,63 +32,27 @@ def test_ast(n: int):
     assert result.stdout == output
 
 
-def test_sem_error_break():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_break.txt"])
-    assert result.exit_code == 0
-    assert "line 1" in result.stdout
-    assert "break" in result.stdout.lower()
-    assert result.stdout.count("line") == 1
-
-
-def test_sem_error_continue():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_continue.txt"])
-    assert result.exit_code == 0
-    assert "line 1" in result.stdout
-    assert "continue" in result.stdout.lower()
-    assert result.stdout.count("line") == 1
-
-
-def test_sem_error_vector():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_vector.txt"])
-    assert result.exit_code == 0
-    assert "line 1" in result.stdout
-    assert "line 3" in result.stdout
-    assert "line 7" in result.stdout
-    assert result.stdout.count("line") == 3
-    assert result.stdout.lower().count("vector") == 3
-
-
-def test_sem_error_variables():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_variables.txt"])
-    assert result.exit_code == 0
-    assert "line 5" in result.stdout
-    assert "line 7" in result.stdout
-    assert result.stdout.count("line") == 2
-    assert result.stdout.lower().count("variable") == 2
-
-
-def test_sem_error_transpose():
-    result = runner.invoke(app, ["sem", "tests/semantic/input_transpose.txt"])
-    assert result.exit_code == 0
-    assert "line 7" in result.stdout
-    assert "transpose" in result.stdout.lower()
-    assert result.stdout.count("line") == 1
-
-
 @pytest.mark.parametrize(
-    "name,line_numbers",
+    "name,line_numbers,additional",
     [
-        ("special_matrix", [1, 11]),
-        ("indexing", [5, 6, 7]),
-        ("indexing_bounds", [4, 11, 12]),
-        ("binary_operations", [7, 8, 14, 16, 17]),
-        ("comparisons", [7, 9]),
-        ("compound_assignments", [10, 11, 12]),
+        ("break", [1], "break"),
+        ("continue", [1], "continue"),
+        ("vector", [1, 3, 7], "vector"),
+        ("variables", [5, 7], "variable"),
+        ("transpose", [7], "transpose"),
+        ("special_matrix", [1, 11], "matrix"),
+        ("indexing", [5, 6, 7], ""),
+        ("indexing_bounds", [4, 11, 12], "out of bounds"),
+        ("binary_operations", [7, 8, 14, 16, 17], "binary operation"),
+        ("comparisons", [7, 9], "comparison"),
+        ("compound_assignments", [10, 11, 12], "assignment"),
     ],
 )
-def test_sem_errors(name: str, line_numbers: list):
+def test_sem_errors(name: str, line_numbers: list[int], additional: str):
     result = runner.invoke(app, ["sem", f"tests/semantic/input_{name}.txt"])
     assert result.exit_code == 0
     for ln in line_numbers:
         assert f"line {ln}" in result.stdout
     assert result.stdout.lower().count("line") == len(line_numbers)
+    if additional:
+        assert result.stdout.lower().count(additional) == len(line_numbers)
