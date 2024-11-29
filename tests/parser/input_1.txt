@@ -16,7 +16,7 @@ float_3 = .14;
 float_4 = 3.14e-2;
 string_1 = "#Hello!";
 
-H *= H';
+print H';
 
 a = 1;
 b = 2;
