@@ -123,3 +123,14 @@ def test_sem_error_comparisons():
     assert "line 7" in result.stdout
     assert "line 9" in result.stdout
     assert result.stdout.count("line") == 2
+
+
+def test_sem_error_compound_assignments():
+    result = runner.invoke(
+        app, ["sem", "tests/semantic/input_compound_assignments.txt"]
+    )
+    assert result.exit_code == 0
+    assert "line 10" in result.stdout
+    assert "line 11" in result.stdout
+    assert "line 12" in result.stdout
+    assert result.stdout.count("line") == 3

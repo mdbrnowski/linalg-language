@@ -1,4 +1,4 @@
-// $antlr-format columnLimit 100, useTab false, minEmptyLines 1
+// $antlr-format columnLimit 120, useTab false, minEmptyLines 1
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true
 // $antlr-format alignSemicolons hanging, alignColons hanging
 
@@ -57,13 +57,13 @@ comparison
     ;
 
 assignment
-    : (id | elementReference) (
-        ASSIGN
-        | ASSIGN_PLUS
+    : (id | elementReference) ASSIGN expression SEMICOLON # simpleAssignment
+    | (id | elementReference) (
+        ASSIGN_PLUS
         | ASSIGN_MINUS
         | ASSIGN_MULTIPLY
         | ASSIGN_DIVIDE
-    ) expression SEMICOLON
+    ) expression SEMICOLON # compoundAssignment
     ;
 
 print
