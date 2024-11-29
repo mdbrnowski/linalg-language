@@ -1,4 +1,4 @@
-// $antlr-format columnLimit 100, useTab false, minEmptyLines 0
+// $antlr-format columnLimit 120, useTab false, minEmptyLines 0
 // $antlr-format alignSemicolons none, alignColons trailing
 // $antlr-format alignLexerCommands true, alignLabels true, alignTrailers true
 

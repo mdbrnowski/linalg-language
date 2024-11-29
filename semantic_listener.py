@@ -78,28 +78,29 @@ class SemanticListener(MyParserListener):
             )
             self.expr_type[ctx] = None
 
-    def enterAssignment(self, ctx: MyParser.AssignmentContext):
+    def enterSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
         if (
-            ctx.getChild(1).symbol.type == MyParser.ASSIGN
-            and isinstance(ctx.getChild(0), MyParser.IdContext)
+            isinstance(ctx.getChild(0), MyParser.IdContext)
             and ctx.getChild(0).getText() not in self.variables
         ):
-            # type is unknown at this point
             self.variables[ctx.getChild(0).getText()] = Type.TBD
 
-    def exitAssignment(self, ctx: MyParser.AssignmentContext):
+    def exitSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
         if (
-            ctx.getChild(1).symbol.type == MyParser.ASSIGN
-            and isinstance(ctx.getChild(0), MyParser.IdContext)
+            isinstance(ctx.getChild(0), MyParser.IdContext)
             and self.variables[ctx.getChild(0).getText()] is Type.TBD
         ):
-            # we finally know the type
             if self.expr_type[ctx.getChild(2)] is Type.TBD:
                 ctx.parser.notifyErrorListeners(
                     "Using a variable while declaring it is not allowed",
                     ctx.getChild(1).getSymbol(),
                 )
-            self.variables[ctx.getChild(0).getText()] = self.expr_type[ctx.getChild(2)]
+                self.variables[ctx.getChild(0).getText()] = None
+            else:
+                self.variables[ctx.getChild(0).getText()] = self.expr_type[ctx.getChild(2)]
+
+    def exitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
+        pass
 
     def exitBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
         first = ctx.getChild(0)

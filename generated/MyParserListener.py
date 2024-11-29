@@ -98,12 +98,21 @@ class MyParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MyParser#assignment.
-    def enterAssignment(self, ctx:MyParser.AssignmentContext):
+    # Enter a parse tree produced by MyParser#simpleAssignment.
+    def enterSimpleAssignment(self, ctx:MyParser.SimpleAssignmentContext):
         pass
 
-    # Exit a parse tree produced by MyParser#assignment.
-    def exitAssignment(self, ctx:MyParser.AssignmentContext):
+    # Exit a parse tree produced by MyParser#simpleAssignment.
+    def exitSimpleAssignment(self, ctx:MyParser.SimpleAssignmentContext):
+        pass
+
+
+    # Enter a parse tree produced by MyParser#compoundAssignment.
+    def enterCompoundAssignment(self, ctx:MyParser.CompoundAssignmentContext):
+        pass
+
+    # Exit a parse tree produced by MyParser#compoundAssignment.
+    def exitCompoundAssignment(self, ctx:MyParser.CompoundAssignmentContext):
         pass
 
 

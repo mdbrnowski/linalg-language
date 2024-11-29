@@ -50,19 +50,24 @@ class ASTListener(MyParserListener):
         self.level -= 1
 
     def enterComparison(self, ctx: MyParser.ComparisonContext):
-        operator = ctx.getChild(1)
-        print(IND * self.level + operator.getText())
+        print(IND * self.level + ctx.getChild(1).getText())
         self.level += 1
 
     def exitComparison(self, ctx: MyParser.ComparisonContext):
         self.level -= 1
 
-    def enterAssignment(self, ctx: MyParser.AssignmentContext):
-        operator = ctx.getChild(1)
-        print(IND * self.level + operator.getText())
+    def enterSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
+        print(IND * self.level + ctx.getChild(1).getText())
         self.level += 1
 
-    def exitAssignment(self, ctx: MyParser.AssignmentContext):
+    def exitSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
+        self.level -= 1
+
+    def enterCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
+        print(IND * self.level + ctx.getChild(1).getText())
+        self.level += 1
+
+    def exitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
         self.level -= 1
 
     def enterPrint(self, ctx: MyParser.PrintContext):
