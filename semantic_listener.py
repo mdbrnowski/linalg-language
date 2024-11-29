@@ -88,16 +88,16 @@ class SemanticListener(MyParserListener):
     def exitSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
         if (
             isinstance(ctx.getChild(0), MyParser.IdContext)
-            and self.variables[ctx.getChild(0).getText()] is Type.TBD
+            and self.variables[(var := ctx.getChild(0).getText())] is Type.TBD
         ):
             if self.expr_type[ctx.getChild(2)] is Type.TBD:
                 ctx.parser.notifyErrorListeners(
                     "Using a variable while declaring it is not allowed",
                     ctx.getChild(1).getSymbol(),
                 )
-                self.variables[ctx.getChild(0).getText()] = None
+                self.variables[var] = None
             else:
-                self.variables[ctx.getChild(0).getText()] = self.expr_type[ctx.getChild(2)]
+                self.variables[var] = self.expr_type[ctx.getChild(2)]
 
     def exitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
         pass
