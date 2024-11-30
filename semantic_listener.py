@@ -48,7 +48,13 @@ class SemanticListener(MyParserListener):
 
     def enterForLoop(self, ctx: MyParser.ForLoopContext):
         self.nested_loop_counter += 1
-        self.variables[ctx.getChild(1).getText()] = Type.INT
+        var = ctx.getChild(1).getText()
+        if var in self.variables:
+            ctx.parser.notifyErrorListeners(
+                f"Variable {var} already declared", ctx.getChild(2).getSymbol()
+            )
+        else:
+            self.variables[var] = Type.INT
 
     def exitForLoop(self, ctx: MyParser.ForLoopContext):
         self.nested_loop_counter -= 1
@@ -99,8 +105,15 @@ class SemanticListener(MyParserListener):
                     ctx.getChild(1).getSymbol(),
                 )
                 self.variables[var] = None
+                self.expr_type[ctx.getChild(0)] = None
             else:
                 self.variables[var] = self.expr_type[ctx.getChild(2)]
+                self.expr_type[ctx.getChild(0)] = self.expr_type[ctx.getChild(2)]
+
+        elif self.expr_type[ctx.getChild(0)] != self.expr_type[ctx.getChild(2)]:
+            ctx.parser.notifyErrorListeners(
+                "Incompatible types in an assignment", ctx.getChild(1).getSymbol()
+            )
 
     def exitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
         type_1 = self.expr_type[ctx.getChild(0)]
