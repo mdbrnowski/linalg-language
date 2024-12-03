@@ -1,5 +1,6 @@
 #!.venv/bin/python3
 import typer
+from rich.console import Console
 from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
 from generated.MyLexer import MyLexer
 from generated.MyParser import MyParser
@@ -7,13 +8,22 @@ from ast_listener import ASTListener
 from semantic_listener import SemanticListener
 
 app = typer.Typer(no_args_is_help=True)
+err_console = Console(stderr=True)
+
+
+def _read_code_from_file(filename: str) -> str:
+    try:
+        with open(filename, encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError as e:
+        err_console.print(f"[bold red]File '{filename}' not found")
+        raise typer.Exit(code=1) from e
 
 
 @app.command()
 def lex(filename: str):
     """Lexical analysis"""
-    with open(filename, encoding="utf-8") as f:
-        string = f.read()
+    string = _read_code_from_file(filename)
 
     lexer = MyLexer(InputStream(string))
 
@@ -25,8 +35,7 @@ def lex(filename: str):
 @app.command()
 def parse(filename: str):
     """Syntactic analysis"""
-    with open(filename, encoding="utf-8") as f:
-        string = f.read()
+    string = _read_code_from_file(filename)
 
     lexer = MyLexer(InputStream(string))
     stream = CommonTokenStream(lexer)
@@ -38,8 +47,7 @@ def parse(filename: str):
 @app.command()
 def ast(filename: str):
     """Abstract syntax tree"""
-    with open(filename, encoding="utf-8") as f:
-        string = f.read()
+    string = _read_code_from_file(filename)
 
     lexer = MyLexer(InputStream(string))
     stream = CommonTokenStream(lexer)
@@ -54,8 +62,7 @@ def ast(filename: str):
 @app.command()
 def sem(filename: str):
     """Semantic analysis"""
-    with open(filename, encoding="utf-8") as f:
-        string = f.read()
+    string = _read_code_from_file(filename)
 
     lexer = MyLexer(InputStream(string))
     stream = CommonTokenStream(lexer)
