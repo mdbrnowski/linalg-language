@@ -41,7 +41,7 @@ class SemanticListener(MyParserListener):
 
     def __init__(self):
         self.nested_loop_counter = 0
-        self.variables: dict[str, Type | None] = {}
+        self.variables: dict[str, Type | tuple | None] = {}
         self.expr_type: dict[
             ParserRuleContext, Type | tuple | None
         ] = {}  # values should be either Type or (Type, int | None, int | None, ...)
@@ -224,7 +224,7 @@ class SemanticListener(MyParserListener):
             )
 
     def exitElementReference(self, ctx: MyParser.ElementReferenceContext):
-        references = ctx.children[2::2]
+        references: list[ParserRuleContext] = ctx.children[2::2]
         for ref in references:
             if self.expr_type[ref] != Type.INT:
                 ctx.parser.notifyErrorListeners(
@@ -254,7 +254,7 @@ class SemanticListener(MyParserListener):
             if is_plain_integer(ref) and id_type[i + 1] is not None:
                 if int(ref.getText()) >= id_type[i + 1]:
                     ctx.parser.notifyErrorListeners(
-                        "Index out of bounds", ctx.getChild(1).getSymbol()
+                        "Index out of bounds", ref.getChild(0).getChild(0).getSymbol()
                     )
 
     def exitId(self, ctx: MyParser.IdContext):
