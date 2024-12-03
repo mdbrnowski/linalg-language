@@ -74,5 +74,22 @@ def sem(filename: str):
         ParseTreeWalker().walk(listener, tree)
 
 
+@app.command()
+def run(filename: str):
+    """Interpretation"""
+    string = _read_code_from_file(filename)
+
+    lexer = MyLexer(InputStream(string))
+    stream = CommonTokenStream(lexer)
+    parser = MyParser(stream)
+
+    tree = parser.program()
+    if parser.getNumberOfSyntaxErrors() == 0:
+        listener = SemanticListener()
+        ParseTreeWalker().walk(listener, tree)
+        if parser.getNumberOfSyntaxErrors() == 0:
+            print("No errors found")
+
+
 if __name__ == "__main__":
     app()
