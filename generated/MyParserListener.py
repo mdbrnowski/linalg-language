@@ -17,12 +17,21 @@ class MyParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MyParser#codeBlock.
-    def enterCodeBlock(self, ctx:MyParser.CodeBlockContext):
+    # Enter a parse tree produced by MyParser#scopeStatement.
+    def enterScopeStatement(self, ctx:MyParser.ScopeStatementContext):
         pass
 
-    # Exit a parse tree produced by MyParser#codeBlock.
-    def exitCodeBlock(self, ctx:MyParser.CodeBlockContext):
+    # Exit a parse tree produced by MyParser#scopeStatement.
+    def exitScopeStatement(self, ctx:MyParser.ScopeStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by MyParser#simpleStatement.
+    def enterSimpleStatement(self, ctx:MyParser.SimpleStatementContext):
+        pass
+
+    # Exit a parse tree produced by MyParser#simpleStatement.
+    def exitSimpleStatement(self, ctx:MyParser.SimpleStatementContext):
         pass
 
 

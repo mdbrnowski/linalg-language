@@ -98,7 +98,7 @@ STRING
 
 rule names:
 program
-codeBlock
+statement
 ifThenElse
 if
 then

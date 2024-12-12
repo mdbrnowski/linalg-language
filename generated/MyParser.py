@@ -123,7 +123,7 @@ class MyParser ( Parser ):
                       "PRINT", "ID", "INT", "FLOAT", "STRING" ]
 
     RULE_program = 0
-    RULE_codeBlock = 1
+    RULE_statement = 1
     RULE_ifThenElse = 2
     RULE_if = 3
     RULE_then = 4
@@ -146,7 +146,7 @@ class MyParser ( Parser ):
     RULE_float = 21
     RULE_string = 22
 
-    ruleNames =  [ "program", "codeBlock", "ifThenElse", "if", "then", "else", 
+    ruleNames =  [ "program", "statement", "ifThenElse", "if", "then", "else", 
                    "forLoop", "range", "whileLoop", "comparison", "assignment", 
                    "print", "return", "expression", "specialMatrixFunction", 
                    "break", "continue", "vector", "elementReference", "id", 
@@ -219,11 +219,11 @@ class MyParser ( Parser ):
         def EOF(self):
             return self.getToken(MyParser.EOF, 0)
 
-        def codeBlock(self, i:int=None):
+        def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MyParser.CodeBlockContext)
+                return self.getTypedRuleContexts(MyParser.StatementContext)
             else:
-                return self.getTypedRuleContext(MyParser.CodeBlockContext,i)
+                return self.getTypedRuleContext(MyParser.StatementContext,i)
 
 
         def getRuleIndex(self):
@@ -258,7 +258,7 @@ class MyParser ( Parser ):
             _la = self._input.LA(1)
             while (((_la) & ~0x3f) == 0 and ((1 << _la) & 13731144663040) != 0):
                 self.state = 46
-                self.codeBlock()
+                self.statement()
                 self.state = 51
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -274,88 +274,113 @@ class MyParser ( Parser ):
         return localctx
 
 
-    class CodeBlockContext(ParserRuleContext):
+    class StatementContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def OPEN_BRACKET_CURLY(self):
-            return self.getToken(MyParser.OPEN_BRACKET_CURLY, 0)
 
-        def CLOSE_BRACKET_CURLY(self):
-            return self.getToken(MyParser.CLOSE_BRACKET_CURLY, 0)
+        def getRuleIndex(self):
+            return MyParser.RULE_statement
 
-        def codeBlock(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(MyParser.CodeBlockContext)
-            else:
-                return self.getTypedRuleContext(MyParser.CodeBlockContext,i)
+     
+        def copyFrom(self, ctx:ParserRuleContext):
+            super().copyFrom(ctx)
 
 
-        def ifThenElse(self):
-            return self.getTypedRuleContext(MyParser.IfThenElseContext,0)
 
+    class SimpleStatementContext(StatementContext):
 
-        def forLoop(self):
-            return self.getTypedRuleContext(MyParser.ForLoopContext,0)
-
-
-        def whileLoop(self):
-            return self.getTypedRuleContext(MyParser.WhileLoopContext,0)
-
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a MyParser.StatementContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
 
         def assignment(self):
             return self.getTypedRuleContext(MyParser.AssignmentContext,0)
 
-
         def print_(self):
             return self.getTypedRuleContext(MyParser.PrintContext,0)
-
 
         def return_(self):
             return self.getTypedRuleContext(MyParser.ReturnContext,0)
 
-
         def break_(self):
             return self.getTypedRuleContext(MyParser.BreakContext,0)
-
 
         def continue_(self):
             return self.getTypedRuleContext(MyParser.ContinueContext,0)
 
 
-        def getRuleIndex(self):
-            return MyParser.RULE_codeBlock
-
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCodeBlock" ):
-                listener.enterCodeBlock(self)
+            if hasattr( listener, "enterSimpleStatement" ):
+                listener.enterSimpleStatement(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCodeBlock" ):
-                listener.exitCodeBlock(self)
+            if hasattr( listener, "exitSimpleStatement" ):
+                listener.exitSimpleStatement(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCodeBlock" ):
-                return visitor.visitCodeBlock(self)
+            if hasattr( visitor, "visitSimpleStatement" ):
+                return visitor.visitSimpleStatement(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class ScopeStatementContext(StatementContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a MyParser.StatementContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def OPEN_BRACKET_CURLY(self):
+            return self.getToken(MyParser.OPEN_BRACKET_CURLY, 0)
+        def CLOSE_BRACKET_CURLY(self):
+            return self.getToken(MyParser.CLOSE_BRACKET_CURLY, 0)
+        def statement(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(MyParser.StatementContext)
+            else:
+                return self.getTypedRuleContext(MyParser.StatementContext,i)
+
+        def ifThenElse(self):
+            return self.getTypedRuleContext(MyParser.IfThenElseContext,0)
+
+        def forLoop(self):
+            return self.getTypedRuleContext(MyParser.ForLoopContext,0)
+
+        def whileLoop(self):
+            return self.getTypedRuleContext(MyParser.WhileLoopContext,0)
+
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterScopeStatement" ):
+                listener.enterScopeStatement(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitScopeStatement" ):
+                listener.exitScopeStatement(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitScopeStatement" ):
+                return visitor.visitScopeStatement(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
+    def statement(self):
 
-    def codeBlock(self):
-
-        localctx = MyParser.CodeBlockContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 2, self.RULE_codeBlock)
+        localctx = MyParser.StatementContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 2, self.RULE_statement)
         self._la = 0 # Token type
         try:
             self.state = 70
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [27]:
+                localctx = MyParser.ScopeStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 54
                 self.match(MyParser.OPEN_BRACKET_CURLY)
@@ -364,7 +389,7 @@ class MyParser ( Parser ):
                 _la = self._input.LA(1)
                 while (((_la) & ~0x3f) == 0 and ((1 << _la) & 13731144663040) != 0):
                     self.state = 55
-                    self.codeBlock()
+                    self.statement()
                     self.state = 60
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
@@ -373,41 +398,49 @@ class MyParser ( Parser ):
                 self.match(MyParser.CLOSE_BRACKET_CURLY)
                 pass
             elif token in [32]:
+                localctx = MyParser.ScopeStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
                 self.state = 62
                 self.ifThenElse()
                 pass
             elif token in [34]:
+                localctx = MyParser.ScopeStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
                 self.state = 63
                 self.forLoop()
                 pass
             elif token in [35]:
+                localctx = MyParser.ScopeStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 4)
                 self.state = 64
                 self.whileLoop()
                 pass
             elif token in [43]:
+                localctx = MyParser.SimpleStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 5)
                 self.state = 65
                 self.assignment()
                 pass
             elif token in [42]:
+                localctx = MyParser.SimpleStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 6)
                 self.state = 66
                 self.print_()
                 pass
             elif token in [38]:
+                localctx = MyParser.SimpleStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 7)
                 self.state = 67
                 self.return_()
                 pass
             elif token in [36]:
+                localctx = MyParser.SimpleStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 8)
                 self.state = 68
                 self.break_()
                 pass
             elif token in [37]:
+                localctx = MyParser.SimpleStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 9)
                 self.state = 69
                 self.continue_()
@@ -560,8 +593,8 @@ class MyParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def codeBlock(self):
-            return self.getTypedRuleContext(MyParser.CodeBlockContext,0)
+        def statement(self):
+            return self.getTypedRuleContext(MyParser.StatementContext,0)
 
 
         def getRuleIndex(self):
@@ -591,7 +624,7 @@ class MyParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 82
-            self.codeBlock()
+            self.statement()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -611,8 +644,8 @@ class MyParser ( Parser ):
         def ELSE(self):
             return self.getToken(MyParser.ELSE, 0)
 
-        def codeBlock(self):
-            return self.getTypedRuleContext(MyParser.CodeBlockContext,0)
+        def statement(self):
+            return self.getTypedRuleContext(MyParser.StatementContext,0)
 
 
         def getRuleIndex(self):
@@ -644,7 +677,7 @@ class MyParser ( Parser ):
             self.state = 84
             self.match(MyParser.ELSE)
             self.state = 85
-            self.codeBlock()
+            self.statement()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -675,8 +708,8 @@ class MyParser ( Parser ):
             return self.getTypedRuleContext(MyParser.RangeContext,0)
 
 
-        def codeBlock(self):
-            return self.getTypedRuleContext(MyParser.CodeBlockContext,0)
+        def statement(self):
+            return self.getTypedRuleContext(MyParser.StatementContext,0)
 
 
         def getRuleIndex(self):
@@ -714,7 +747,7 @@ class MyParser ( Parser ):
             self.state = 90
             self.range_()
             self.state = 91
-            self.codeBlock()
+            self.statement()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -802,8 +835,8 @@ class MyParser ( Parser ):
         def CLOSE_BRACKET_ROUND(self):
             return self.getToken(MyParser.CLOSE_BRACKET_ROUND, 0)
 
-        def codeBlock(self):
-            return self.getTypedRuleContext(MyParser.CodeBlockContext,0)
+        def statement(self):
+            return self.getTypedRuleContext(MyParser.StatementContext,0)
 
 
         def getRuleIndex(self):
@@ -841,7 +874,7 @@ class MyParser ( Parser ):
             self.state = 100
             self.match(MyParser.CLOSE_BRACKET_ROUND)
             self.state = 101
-            self.codeBlock()
+            self.statement()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
