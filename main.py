@@ -1,10 +1,12 @@
 #!.venv/bin/python3
 import typer
+from antlr4 import CommonTokenStream, InputStream, ParseTreeWalker
 from rich.console import Console
-from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
+
+from ast_listener import ASTListener
 from generated.MyLexer import MyLexer
 from generated.MyParser import MyParser
-from ast_listener import ASTListener
+from interpreter import Interpreter
 from semantic_listener import SemanticListener
 
 app = typer.Typer(no_args_is_help=True)
@@ -72,6 +74,24 @@ def sem(filename: str):
     if parser.getNumberOfSyntaxErrors() == 0:
         listener = SemanticListener()
         ParseTreeWalker().walk(listener, tree)
+
+
+@app.command()
+def run(filename: str):
+    """Interpretation"""
+    string = _read_code_from_file(filename)
+
+    lexer = MyLexer(InputStream(string))
+    stream = CommonTokenStream(lexer)
+    parser = MyParser(stream)
+
+    tree = parser.program()
+    if parser.getNumberOfSyntaxErrors() == 0:
+        listener = SemanticListener()
+        ParseTreeWalker().walk(listener, tree)
+        if parser.getNumberOfSyntaxErrors() == 0:
+            visitor = Interpreter()
+            visitor.visit(tree)
 
 
 if __name__ == "__main__":
