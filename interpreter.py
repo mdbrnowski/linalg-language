@@ -8,7 +8,10 @@ class Interpreter(MyParserVisitor):
         print("Program")
         return self.visitChildren(ctx)
 
-    def visitCodeBlock(self, ctx: MyParser.CodeBlockContext):
+    def visitScopeStatement(self, ctx: MyParser.ScopeStatementContext):
+        return self.visitChildren(ctx)
+
+    def visitSimpleStatement(self, ctx: MyParser.SimpleStatementContext):
         return self.visitChildren(ctx)
 
     def visitIfThenElse(self, ctx: MyParser.IfThenElseContext):

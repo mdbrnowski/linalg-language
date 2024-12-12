@@ -12,15 +12,20 @@ def test_parser(n: int):
     assert result.stdout == ""
 
 
-def test_parser_errors():
-    result = runner.invoke(app, ["parse", "tests/parser/invalid_input_1.txt"])
+@pytest.mark.parametrize(
+    "n,line_numbers",
+    [
+        (1, [1, 3, 7]),
+        (2, [2]),
+        (3, [1, 4]),
+    ],
+)
+def test_parser_errors(n: int, line_numbers: list[int]):
+    result = runner.invoke(app, ["parse", f"tests/parser/invalid_input_{n}.txt"])
     assert result.exit_code == 0
-    assert "line 1" in result.stdout
-    assert "line 3" in result.stdout
-    assert "line 7" in result.stdout
-    assert "line 10" in result.stdout
-    assert "line 12" in result.stdout
-    assert result.stdout.count("line") == 5
+    for ln in line_numbers:
+        assert f"line {ln}" in result.stdout
+    assert result.stdout.lower().count("line") == len(line_numbers)
 
 
 @pytest.mark.parametrize("n", [1, 2, 3])

@@ -14,8 +14,13 @@ class MyParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MyParser#codeBlock.
-    def visitCodeBlock(self, ctx:MyParser.CodeBlockContext):
+    # Visit a parse tree produced by MyParser#scopeStatement.
+    def visitScopeStatement(self, ctx:MyParser.ScopeStatementContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MyParser#simpleStatement.
+    def visitSimpleStatement(self, ctx:MyParser.SimpleStatementContext):
         return self.visitChildren(ctx)
 
 

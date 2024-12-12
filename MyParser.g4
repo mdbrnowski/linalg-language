@@ -9,19 +9,19 @@ options {
 }
 
 program
-    : (codeBlock)* EOF
+    : statement* EOF
     ;
 
-codeBlock
-    : OPEN_BRACKET_CURLY (codeBlock)* CLOSE_BRACKET_CURLY
-    | ifThenElse
-    | forLoop
-    | whileLoop
-    | assignment
-    | print
-    | return
-    | break
-    | continue
+statement
+    : OPEN_BRACKET_CURLY statement* CLOSE_BRACKET_CURLY # scopeStatement
+    | ifThenElse                                        # scopeStatement
+    | forLoop                                           # scopeStatement
+    | whileLoop                                         # scopeStatement
+    | assignment                                        # simpleStatement
+    | print                                             # simpleStatement
+    | return                                            # simpleStatement
+    | break                                             # simpleStatement
+    | continue                                          # simpleStatement
     ;
 
 ifThenElse
@@ -33,15 +33,15 @@ if
     ;
 
 then
-    : codeBlock
+    : statement
     ;
 
 else
-    : ELSE codeBlock
+    : ELSE statement
     ;
 
 forLoop
-    : FOR id ASSIGN range codeBlock
+    : FOR id ASSIGN range statement
     ;
 
 range
@@ -49,7 +49,7 @@ range
     ;
 
 whileLoop
-    : WHILE OPEN_BRACKET_ROUND comparison CLOSE_BRACKET_ROUND codeBlock
+    : WHILE OPEN_BRACKET_ROUND comparison CLOSE_BRACKET_ROUND statement
     ;
 
 comparison
