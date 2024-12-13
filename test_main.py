@@ -63,3 +63,15 @@ def test_sem_errors(name: str, line_numbers: list[int], additional: str):
     assert result.stdout.lower().count("line") == len(line_numbers)
     if additional:
         assert result.stdout.lower().count(additional) == len(line_numbers)
+
+
+@pytest.mark.parametrize(
+    "name,output",
+    [
+        ("simple_math", [23, 35, 1, 1.0, 1]),
+    ],
+)
+def test_interpreter(name: str, output: str):
+    result = runner.invoke(app, ["run", f"tests/interpreter/{name}.txt"])
+    assert result.exit_code == 0
+    assert result.stdout.strip() == "\n".join(map(str, output))
