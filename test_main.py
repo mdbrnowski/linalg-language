@@ -68,10 +68,10 @@ def test_sem_errors(name: str, line_numbers: list[int], additional: str):
 @pytest.mark.parametrize(
     "name,output",
     [
-        ("simple_math", [23, 35, 1, 1.0, 1]),
+        ("simple_math", [23, 35, 1, 1.0, 1, -2]),
     ],
 )
 def test_interpreter(name: str, output: str):
     result = runner.invoke(app, ["run", f"tests/interpreter/{name}.txt"])
     assert result.exit_code == 0
-    assert result.stdout.strip() == "\n".join(map(str, output))
+    assert result.stdout == "\n".join(map(str, output)) + "\n"

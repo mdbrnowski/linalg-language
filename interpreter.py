@@ -71,7 +71,7 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitMinusExpression(self, ctx: MyParser.MinusExpressionContext):
-        return self.visitChildren(ctx)  # todo
+        return -self.visit(ctx.getChild(1))
 
     def visitSingleExpression(self, ctx: MyParser.SingleExpressionContext):
         return self.visit(ctx.getChild(0))

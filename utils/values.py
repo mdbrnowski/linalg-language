@@ -29,6 +29,9 @@ class Int(Value):
             return Float(self.value / other.value)
         raise TypeError()
 
+    def __neg__(self):
+        return Int(-self.value)
+
 
 class Float(Value):
     def __init__(self, value):
@@ -53,6 +56,9 @@ class Float(Value):
         if isinstance(other, Float):
             return Float(self.value / other.value)
         raise TypeError()
+
+    def __neg__(self):
+        return Float(-self.value)
 
 
 class String(Value):
