@@ -26,10 +26,10 @@ ASSIGN_MINUS    : '-=';
 ASSIGN_MULTIPLY : '*=';
 ASSIGN_DIVIDE   : '/=';
 
-LE  : '<';
-GE  : '>';
+LT  : '<';
+GT  : '>';
 EQ  : '==';
-NE  : '!=';
+NEQ  : '!=';
 LEQ : '<=';
 GEQ : '>=';
 

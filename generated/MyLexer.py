@@ -148,10 +148,10 @@ class MyLexer(Lexer):
     ASSIGN_MINUS = 14
     ASSIGN_MULTIPLY = 15
     ASSIGN_DIVIDE = 16
-    LE = 17
-    GE = 18
+    LT = 17
+    GT = 18
     EQ = 19
-    NE = 20
+    NEQ = 20
     LEQ = 21
     GEQ = 22
     OPEN_BRACKET_ROUND = 23
@@ -195,7 +195,7 @@ class MyLexer(Lexer):
             "WHITESPACE", "COMMENT", "PLUS", "MINUS", "MULTIPLY", "DIVIDE", 
             "MAT_PLUS", "MAT_MINUS", "MAT_MULTIPLY", "MAT_DIVIDE", "MAT_TRANSPOSE_OP", 
             "ASSIGN", "ASSIGN_PLUS", "ASSIGN_MINUS", "ASSIGN_MULTIPLY", 
-            "ASSIGN_DIVIDE", "LE", "GE", "EQ", "NE", "LEQ", "GEQ", "OPEN_BRACKET_ROUND", 
+            "ASSIGN_DIVIDE", "LT", "GT", "EQ", "NEQ", "LEQ", "GEQ", "OPEN_BRACKET_ROUND", 
             "CLOSE_BRACKET_ROUND", "OPEN_BRACKET_SQUARE", "CLOSE_BRACKET_SQUARE", 
             "OPEN_BRACKET_CURLY", "CLOSE_BRACKET_CURLY", "RANGE_OP", "COMMA", 
             "SEMICOLON", "IF", "ELSE", "FOR", "WHILE", "BREAK", "CONTINUE", 
@@ -205,8 +205,8 @@ class MyLexer(Lexer):
     ruleNames = [ "WHITESPACE", "COMMENT", "PLUS", "MINUS", "MULTIPLY", 
                   "DIVIDE", "MAT_PLUS", "MAT_MINUS", "MAT_MULTIPLY", "MAT_DIVIDE", 
                   "MAT_TRANSPOSE_OP", "ASSIGN", "ASSIGN_PLUS", "ASSIGN_MINUS", 
-                  "ASSIGN_MULTIPLY", "ASSIGN_DIVIDE", "LE", "GE", "EQ", 
-                  "NE", "LEQ", "GEQ", "OPEN_BRACKET_ROUND", "CLOSE_BRACKET_ROUND", 
+                  "ASSIGN_MULTIPLY", "ASSIGN_DIVIDE", "LT", "GT", "EQ", 
+                  "NEQ", "LEQ", "GEQ", "OPEN_BRACKET_ROUND", "CLOSE_BRACKET_ROUND", 
                   "OPEN_BRACKET_SQUARE", "CLOSE_BRACKET_SQUARE", "OPEN_BRACKET_CURLY", 
                   "CLOSE_BRACKET_CURLY", "RANGE_OP", "COMMA", "SEMICOLON", 
                   "IF", "ELSE", "FOR", "WHILE", "BREAK", "CONTINUE", "RETURN", 

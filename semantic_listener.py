@@ -78,7 +78,7 @@ class SemanticListener(MyParserListener):
         if not (
             children_types <= {Type.INT, Type.FLOAT}
             or (
-                ctx.getChild(1).symbol.type in {MyParser.EQ, MyParser.NE}
+                ctx.getChild(1).symbol.type in {MyParser.EQ, MyParser.NEQ}
                 and children_types <= {Type.STRING}
             )
         ):

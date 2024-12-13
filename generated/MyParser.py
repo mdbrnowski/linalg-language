@@ -115,7 +115,7 @@ class MyParser ( Parser ):
                       "MULTIPLY", "DIVIDE", "MAT_PLUS", "MAT_MINUS", "MAT_MULTIPLY", 
                       "MAT_DIVIDE", "MAT_TRANSPOSE_OP", "ASSIGN", "ASSIGN_PLUS", 
                       "ASSIGN_MINUS", "ASSIGN_MULTIPLY", "ASSIGN_DIVIDE", 
-                      "LE", "GE", "EQ", "NE", "LEQ", "GEQ", "OPEN_BRACKET_ROUND", 
+                      "LT", "GT", "EQ", "NEQ", "LEQ", "GEQ", "OPEN_BRACKET_ROUND", 
                       "CLOSE_BRACKET_ROUND", "OPEN_BRACKET_SQUARE", "CLOSE_BRACKET_SQUARE", 
                       "OPEN_BRACKET_CURLY", "CLOSE_BRACKET_CURLY", "RANGE_OP", 
                       "COMMA", "SEMICOLON", "IF", "ELSE", "FOR", "WHILE", 
@@ -169,10 +169,10 @@ class MyParser ( Parser ):
     ASSIGN_MINUS=14
     ASSIGN_MULTIPLY=15
     ASSIGN_DIVIDE=16
-    LE=17
-    GE=18
+    LT=17
+    GT=18
     EQ=19
-    NE=20
+    NEQ=20
     LEQ=21
     GEQ=22
     OPEN_BRACKET_ROUND=23
@@ -898,17 +898,17 @@ class MyParser ( Parser ):
                 return self.getTypedRuleContext(MyParser.ExpressionContext,i)
 
 
-        def LE(self):
-            return self.getToken(MyParser.LE, 0)
-
-        def GE(self):
-            return self.getToken(MyParser.GE, 0)
-
         def EQ(self):
             return self.getToken(MyParser.EQ, 0)
 
-        def NE(self):
-            return self.getToken(MyParser.NE, 0)
+        def NEQ(self):
+            return self.getToken(MyParser.NEQ, 0)
+
+        def LT(self):
+            return self.getToken(MyParser.LT, 0)
+
+        def GT(self):
+            return self.getToken(MyParser.GT, 0)
 
         def LEQ(self):
             return self.getToken(MyParser.LEQ, 0)
