@@ -69,6 +69,7 @@ def test_sem_errors(name: str, line_numbers: list[int], additional: str):
     "name,output",
     [
         ("simple_math", [23, 35, 1, 1.0, 1, -2]),
+        ("conditions", [0, 1, 0, 1, 0, 1, 0, 1]),
     ],
 )
 def test_interpreter(name: str, output: str):

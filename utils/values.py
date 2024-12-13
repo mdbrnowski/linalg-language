@@ -2,6 +2,36 @@ class Value:
     def __init__(self, value):
         self.value = value
 
+    def __eq__(self, other):
+        try:
+            return self.value == other.value
+        except TypeError:
+            raise TypeError()
+
+    def __lt__(self, other):
+        try:
+            return self.value < other.value
+        except TypeError:
+            raise TypeError()
+
+    def __le__(self, other):
+        try:
+            return self.value <= other.value
+        except TypeError:
+            raise TypeError()
+
+    def __gt__(self, other):
+        try:
+            return self.value > other.value
+        except TypeError:
+            raise TypeError()
+
+    def __ge__(self, other):
+        try:
+            return self.value >= other.value
+        except TypeError:
+            raise TypeError()
+
 
 class Int(Value):
     def __init__(self, value):

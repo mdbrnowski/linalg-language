@@ -14,16 +14,17 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitIfThenElse(self, ctx: MyParser.IfThenElseContext):
-        return self.visitChildren(ctx)  # todo
+        condition = self.visit(ctx.getChild(0))
+        if condition:
+            return self.visit(ctx.getChild(1))
+        elif ctx.getChildCount() == 3:
+            return self.visit(ctx.getChild(2))
 
     def visitIf(self, ctx: MyParser.IfContext):
-        return self.visitChildren(ctx)  # todo
-
-    def visitThen(self, ctx: MyParser.ThenContext):
-        return self.visitChildren(ctx)  # todo
+        return self.visit(ctx.getChild(2))
 
     def visitElse(self, ctx: MyParser.ElseContext):
-        return self.visitChildren(ctx)  # todo
+        return self.visit(ctx.getChild(1))
 
     def visitForLoop(self, ctx: MyParser.ForLoopContext):
         return self.visitChildren(ctx)  # todo
@@ -35,7 +36,21 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitComparison(self, ctx: MyParser.ComparisonContext):
-        return self.visitChildren(ctx)  # todo
+        a = self.visit(ctx.getChild(0))
+        b = self.visit(ctx.getChild(2))
+        match ctx.getChild(1).symbol.type:
+            case MyParser.EQ:
+                return a == b
+            case MyParser.NEQ:
+                return a != b
+            case MyParser.LT:
+                return a < b
+            case MyParser.LEQ:
+                return a <= b
+            case MyParser.GT:
+                return a > b
+            case MyParser.GEQ:
+                return a >= b
 
     def visitSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
         return self.visitChildren(ctx)  # todo
@@ -44,7 +59,7 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitPrint(self, ctx: MyParser.PrintContext):
-        for i in range(1, len(ctx.children) - 1, 2):
+        for i in range(1, ctx.getChildCount() - 1, 2):
             print(self.visit(ctx.children[i]).value)
 
     def visitReturn(self, ctx: MyParser.ReturnContext):
@@ -72,9 +87,6 @@ class Interpreter(MyParserVisitor):
 
     def visitMinusExpression(self, ctx: MyParser.MinusExpressionContext):
         return -self.visit(ctx.getChild(1))
-
-    def visitSingleExpression(self, ctx: MyParser.SingleExpressionContext):
-        return self.visit(ctx.getChild(0))
 
     def visitSpecialMatrixFunction(self, ctx: MyParser.SpecialMatrixFunctionContext):
         return self.visitChildren(ctx)  # todo
