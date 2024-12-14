@@ -1,0 +1,9 @@
+A = eye(2);
+print A[0];
+print A[0, 1];
+A[0, 1] = 2;
+print A;
+A[0] = [0, 2];
+print A;
+A[0, 1] -= 2;
+print A;

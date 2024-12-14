@@ -4,7 +4,7 @@ from copy import deepcopy
 from generated.MyParser import MyParser
 from generated.MyParserVisitor import MyParserVisitor
 from utils.memory import MemoryStack
-from utils.values import Int, Float, String, Vector
+from utils.values import Value, Int, Float, String, Vector
 
 
 class Break(Exception):
@@ -13,6 +13,13 @@ class Break(Exception):
 
 class Continue(Exception):
     pass
+
+
+def not_same_type(a: Value, b: Value):
+    return type(a) is not type(b) or (
+        isinstance(a, Vector)
+        and (a.dims != b.dims or a.primitive_type != b.primitive_type)
+    )
 
 
 class Interpreter(MyParserVisitor):
@@ -84,29 +91,44 @@ class Interpreter(MyParserVisitor):
                 return a >= b
 
     def visitSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
-        if ctx.id_():
-            self.visitChildren(ctx)
+        if ctx.id_():  # a = 1
             self.memory_stack.put(ctx.id_().getText(), self.visit(ctx.expression()))
-        else:
-            pass  # todo
+        else:  # a[0] = 1
+            ref_value = self.visit(ctx.elementReference())
+            new_value = self.visit(ctx.expression())
+            if not_same_type(ref_value, new_value):
+                raise TypeError
+            ref_value.value = new_value.value
 
     def visitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
-        if ctx.id_():
-            self.visitChildren(ctx)
-            old_value = self.memory_stack.get(ctx.id_().getText())
+        if ctx.id_():  # a += 1
+            value = self.memory_stack.get(ctx.id_().getText())
             new_value = self.visit(ctx.expression())
             match ctx.getChild(1).symbol.type:
                 case MyParser.ASSIGN_PLUS:
-                    new_value = old_value + new_value
+                    new_value = value + new_value
                 case MyParser.ASSIGN_MINUS:
-                    new_value = old_value - new_value
+                    new_value = value - new_value
                 case MyParser.ASSIGN_MULTIPLY:
-                    new_value = old_value * new_value
+                    new_value = value * new_value
                 case MyParser.ASSIGN_DIVIDE:
-                    new_value = old_value / new_value
+                    new_value = value / new_value
             self.memory_stack.put(ctx.id_().getText(), new_value)
-        else:
-            pass  # todo
+        else:  # a[0] += 1
+            ref_value = self.visit(ctx.elementReference())
+            new_value = self.visit(ctx.expression())
+            if not_same_type(ref_value, new_value):
+                raise TypeError
+            match ctx.getChild(1).symbol.type:
+                case MyParser.ASSIGN_PLUS:
+                    new_value = ref_value + new_value
+                case MyParser.ASSIGN_MINUS:
+                    new_value = ref_value - new_value
+                case MyParser.ASSIGN_MULTIPLY:
+                    new_value = ref_value * new_value
+                case MyParser.ASSIGN_DIVIDE:
+                    new_value = ref_value / new_value
+            ref_value.value = new_value.value
 
     def visitPrint(self, ctx: MyParser.PrintContext):
         for i in range(ctx.getChildCount() // 2):
@@ -182,7 +204,17 @@ class Interpreter(MyParserVisitor):
         return Vector(elements)
 
     def visitElementReference(self, ctx: MyParser.ElementReferenceContext):
-        return self.visitChildren(ctx)  # todo
+        indices = [
+            self.visit(ctx.expression(i)) for i in range(ctx.getChildCount() // 2 - 1)
+        ]
+        if {type(idx) for idx in indices} != {Int}:
+            raise TypeError
+        result = self.visit(ctx.id_())
+        for idx in indices:
+            if not isinstance(result, Vector):
+                raise TypeError
+            result = result.value[idx.value]
+        return result
 
     def visitId(self, ctx: MyParser.IdContext):
         return self.memory_stack.get(ctx.getText())

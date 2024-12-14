@@ -108,7 +108,11 @@ class Vector(Value):
         if (
             len(
                 {
-                    (type(elem), elem.dims if isinstance(elem, Vector) else None)
+                    (
+                        (elem.dims, elem.primitive_type)
+                        if isinstance(elem, Vector)
+                        else type(elem)
+                    )
                     for elem in value
                 }
             )
@@ -118,8 +122,10 @@ class Vector(Value):
 
         if isinstance(value[0], Vector):
             self.dims = (len(value), *value[0].dims)
+            self.primitive_type = value[0].primitive_type
         else:
             self.dims = (len(value),)
+            self.primitive_type = type(value[0])
 
     def __str__(self):
         return "[" + ", ".join(str(elem) for elem in self.value) + "]"
