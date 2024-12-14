@@ -1,6 +1,8 @@
+from copy import deepcopy
+
 from generated.MyParser import MyParser
 from generated.MyParserVisitor import MyParserVisitor
-from utils.values import Int, Float, String
+from utils.values import Int, Float, String, Vector
 
 
 class Interpreter(MyParserVisitor):
@@ -60,7 +62,7 @@ class Interpreter(MyParserVisitor):
 
     def visitPrint(self, ctx: MyParser.PrintContext):
         for i in range(1, ctx.getChildCount() - 1, 2):
-            print(self.visit(ctx.children[i]).value)
+            print(str(self.visit(ctx.getChild(i))))
 
     def visitReturn(self, ctx: MyParser.ReturnContext):
         return self.visitChildren(ctx)  # todo
@@ -83,13 +85,35 @@ class Interpreter(MyParserVisitor):
         return self.visit(ctx.getChild(1))
 
     def visitTransposeExpression(self, ctx: MyParser.TransposeExpressionContext):
-        return self.visitChildren(ctx)  # todo
+        vector = self.visit(ctx.getChild(0))
+        if not isinstance(vector, Vector):
+            raise TypeError
+        return vector.transpose()
 
     def visitMinusExpression(self, ctx: MyParser.MinusExpressionContext):
         return -self.visit(ctx.getChild(1))
 
     def visitSpecialMatrixFunction(self, ctx: MyParser.SpecialMatrixFunctionContext):
-        return self.visitChildren(ctx)  # todo
+        fname = ctx.getChild(0).symbol.type
+        if fname == MyParser.EYE:
+            dim = self.visit(ctx.getChild(2))
+            if not isinstance(dim, Int):
+                raise TypeError
+            rows = [
+                Vector([Int(i == j) for j in range(dim.value)])
+                for i in range(dim.value)
+            ]
+            return Vector(rows)
+        else:
+            dims = [
+                self.visit(ctx.getChild(i)) for i in range(2, ctx.getChildCount(), 2)
+            ]
+            if {type(dim) for dim in dims} != {Int}:
+                raise TypeError
+            vector = {MyParser.ZEROS: Int(0), MyParser.ONES: Int(1)}[fname]
+            for dim in reversed(dims):
+                vector = Vector([deepcopy(vector) for _ in range(dim.value)])
+            return vector
 
     def visitBreak(self, ctx: MyParser.BreakContext):
         return self.visitChildren(ctx)  # todo
@@ -98,7 +122,10 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitVector(self, ctx: MyParser.VectorContext):
-        return self.visitChildren(ctx)  # todo
+        elements = [
+            self.visit(ctx.getChild(i)) for i in range(1, ctx.getChildCount() - 1, 2)
+        ]
+        return Vector(elements)
 
     def visitElementReference(self, ctx: MyParser.ElementReferenceContext):
         return self.visitChildren(ctx)  # todo
