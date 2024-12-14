@@ -68,7 +68,8 @@ def test_sem_errors(name: str, line_numbers: list[int], additional: str):
 @pytest.mark.parametrize(
     "name,output",
     [
-        ("simple_math", [23, 35, 1, 1.0, 1, -2]),
+        ("simple_math", [23, 35, 1.0, 1.0, 1, -2, 9.0, 6.0, 1.0]),
+        ("strings", ["aaa", "abcd"]),
         ("conditions", [0, 1, 0, 1, 0, 1, 0, 1]),
         (
             "vectors",
