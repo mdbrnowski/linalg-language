@@ -46,22 +46,28 @@ class Int(Value):
     def __add__(self, other):
         if isinstance(other, Int):
             return Int(self.value + other.value)
+        elif isinstance(other, Float):
+            return Float(self.value + other.value)
         raise TypeError()
 
     def __sub__(self, other):
         if isinstance(other, Int):
             return Int(self.value - other.value)
+        elif isinstance(other, Float):
+            return Float(self.value - other.value)
         raise TypeError()
 
     def __mul__(self, other):
         if isinstance(other, Int):
             return Int(self.value * other.value)
+        elif isinstance(other, Float):
+            return Float(self.value * other.value)
         raise TypeError()
 
     def __truediv__(self, other):
         if isinstance(other, Int):
-            if self.value % other.value == 0:
-                return Int(self.value // other.value)
+            return Float(self.value / other.value)
+        elif isinstance(other, Float):
             return Float(self.value / other.value)
         raise TypeError()
 
@@ -74,22 +80,22 @@ class Float(Value):
         super().__init__(float(value))
 
     def __add__(self, other):
-        if isinstance(other, Float):
+        if isinstance(other, Float) or isinstance(other, Int):
             return Float(self.value + other.value)
         raise TypeError()
 
     def __sub__(self, other):
-        if isinstance(other, Float):
+        if isinstance(other, Float) or isinstance(other, Int):
             return Float(self.value - other.value)
         raise TypeError()
 
     def __mul__(self, other):
-        if isinstance(other, Float):
+        if isinstance(other, Float) or isinstance(other, Int):
             return Float(self.value * other.value)
         raise TypeError()
 
     def __truediv__(self, other):
-        if isinstance(other, Float):
+        if isinstance(other, Float) or isinstance(other, Int):
             return Float(self.value / other.value)
         raise TypeError()
 
@@ -100,6 +106,16 @@ class Float(Value):
 class String(Value):
     def __init__(self, value):
         super().__init__(value)
+
+    def __add__(self, other):
+        if isinstance(other, String):
+            return String(self.value + other.value)
+        raise TypeError()
+
+    def __mul__(self, other):
+        if isinstance(other, Int):
+            return String(self.value * other.value)
+        raise TypeError()
 
 
 class Vector(Value):
@@ -130,49 +146,28 @@ class Vector(Value):
     def __str__(self):
         return "[" + ", ".join(str(elem) for elem in self.value) + "]"
 
-    def mat_add(self, other):
+    def _mat_op(self, other, op):
         if isinstance(other, Vector):
             rows = []
             for elem, other_elem in zip(self.value, other.value):
                 if isinstance(elem, Vector):
-                    rows.append(elem.mat_add(other_elem))
+                    rows.append(elem._mat_op(other_elem, op))
                 else:
-                    rows.append(elem + other_elem)
+                    rows.append(op(elem, other_elem))
             return Vector(rows)
         raise TypeError()
+
+    def mat_add(self, other):
+        return self._mat_op(other, lambda x, y: x + y)
 
     def mat_sub(self, other):
-        if isinstance(other, Vector):
-            rows = []
-            for elem, other_elem in zip(self.value, other.value):
-                if isinstance(elem, Vector):
-                    rows.append(elem.mat_sub(other_elem))
-                else:
-                    rows.append(elem - other_elem)
-            return Vector(rows)
-        raise TypeError()
+        return self._mat_op(other, lambda x, y: x - y)
 
     def mat_mul(self, other):
-        if isinstance(other, Vector):
-            rows = []
-            for elem, other_elem in zip(self.value, other.value):
-                if isinstance(elem, Vector):
-                    rows.append(elem.mat_mul(other_elem))
-                else:
-                    rows.append(elem * other_elem)
-            return Vector(rows)
-        raise TypeError()
+        return self._mat_op(other, lambda x, y: x * y)
 
     def mat_truediv(self, other):
-        if isinstance(other, Vector):
-            rows = []
-            for elem, other_elem in zip(self.value, other.value):
-                if isinstance(elem, Vector):
-                    rows.append(elem.mat_truediv(other_elem))
-                else:
-                    rows.append(elem / other_elem)
-            return Vector(rows)
-        raise TypeError()
+        return self._mat_op(other, lambda x, y: x / y)
 
     def transpose(self):
         if len(self.dims) != 2:
