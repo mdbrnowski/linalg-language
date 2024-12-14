@@ -17,17 +17,17 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitIfThenElse(self, ctx: MyParser.IfThenElseContext):
-        condition = self.visit(ctx.getChild(0))
+        condition = self.visit(ctx.if_())
         if condition:
-            return self.visit(ctx.getChild(1))
-        elif ctx.getChildCount() == 3:
-            return self.visit(ctx.getChild(2))
+            return self.visit(ctx.then())
+        elif ctx.else_() is not None:
+            return self.visit(ctx.else_())
 
     def visitIf(self, ctx: MyParser.IfContext):
-        return self.visit(ctx.getChild(2))
+        return self.visit(ctx.comparison())
 
     def visitElse(self, ctx: MyParser.ElseContext):
-        return self.visit(ctx.getChild(1))
+        return self.visit(ctx.statement())
 
     def visitForLoop(self, ctx: MyParser.ForLoopContext):
         return self.visitChildren(ctx)  # todo
@@ -39,8 +39,8 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitComparison(self, ctx: MyParser.ComparisonContext):
-        a = self.visit(ctx.getChild(0))
-        b = self.visit(ctx.getChild(2))
+        a = self.visit(ctx.expression(0))
+        b = self.visit(ctx.expression(1))
         match ctx.getChild(1).symbol.type:
             case MyParser.EQ:
                 return a == b
@@ -62,8 +62,8 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitPrint(self, ctx: MyParser.PrintContext):
-        for i in range(1, ctx.getChildCount() - 1, 2):
-            print(str(self.visit(ctx.getChild(i))))
+        for i in range(ctx.getChildCount() // 2):
+            print(str(self.visit(ctx.expression(i))))
 
     def visitReturn(self, ctx: MyParser.ReturnContext):
         if ctx.expression() is not None:
@@ -74,8 +74,8 @@ class Interpreter(MyParserVisitor):
         sys.exit()
 
     def visitBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
-        a = self.visit(ctx.getChild(0))
-        b = self.visit(ctx.getChild(2))
+        a = self.visit(ctx.expression(0))
+        b = self.visit(ctx.expression(1))
         match ctx.op.type:
             case MyParser.PLUS:
                 return a + b
@@ -88,21 +88,21 @@ class Interpreter(MyParserVisitor):
             # todo: MAT_* operations
 
     def visitParenthesesExpression(self, ctx: MyParser.ParenthesesExpressionContext):
-        return self.visit(ctx.getChild(1))
+        return self.visit(ctx.expression())
 
     def visitTransposeExpression(self, ctx: MyParser.TransposeExpressionContext):
-        vector = self.visit(ctx.getChild(0))
+        vector = self.visit(ctx.expression())
         if not isinstance(vector, Vector):
             raise TypeError
         return vector.transpose()
 
     def visitMinusExpression(self, ctx: MyParser.MinusExpressionContext):
-        return -self.visit(ctx.getChild(1))
+        return -self.visit(ctx.expression())
 
     def visitSpecialMatrixFunction(self, ctx: MyParser.SpecialMatrixFunctionContext):
         fname = ctx.getChild(0).symbol.type
         if fname == MyParser.EYE:
-            dim = self.visit(ctx.getChild(2))
+            dim = self.visit(ctx.expression(0))
             if not isinstance(dim, Int):
                 raise TypeError
             rows = [
@@ -112,7 +112,8 @@ class Interpreter(MyParserVisitor):
             return Vector(rows)
         else:
             dims = [
-                self.visit(ctx.getChild(i)) for i in range(2, ctx.getChildCount(), 2)
+                self.visit(ctx.expression(i))
+                for i in range(ctx.getChildCount() // 2 - 1)
             ]
             if {type(dim) for dim in dims} != {Int}:
                 raise TypeError
@@ -129,7 +130,7 @@ class Interpreter(MyParserVisitor):
 
     def visitVector(self, ctx: MyParser.VectorContext):
         elements = [
-            self.visit(ctx.getChild(i)) for i in range(1, ctx.getChildCount() - 1, 2)
+            self.visit(ctx.expression(i)) for i in range(ctx.getChildCount() // 2)
         ]
         return Vector(elements)
 
