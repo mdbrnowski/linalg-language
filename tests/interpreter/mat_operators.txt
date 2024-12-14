@@ -1,0 +1,9 @@
+A = ones(2, 2);
+B = ones(2, 2);
+A = A .+ B;
+print A;
+A = A .* A;
+print A;
+A = A .- B;
+print A;
+A = A ./ B;

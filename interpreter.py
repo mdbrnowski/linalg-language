@@ -154,7 +154,14 @@ class Interpreter(MyParserVisitor):
                 return a * b
             case MyParser.DIVIDE:
                 return a / b
-            # todo: MAT_* operations
+            case MyParser.MAT_PLUS:
+                return a.mat_add(b)
+            case MyParser.MAT_MINUS:
+                return a.mat_sub(b)
+            case MyParser.MAT_MULTIPLY:
+                return a.mat_mul(b)
+            case MyParser.MAT_DIVIDE:
+                return a.mat_truediv(b)
 
     def visitParenthesesExpression(self, ctx: MyParser.ParenthesesExpressionContext):
         return self.visit(ctx.expression())

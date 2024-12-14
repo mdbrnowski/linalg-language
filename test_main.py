@@ -95,6 +95,14 @@ def test_sem_errors(name: str, line_numbers: list[int], additional: str):
                 [[0, 0], [0, 1]],
             ],
         ),
+        (
+            "mat_operators",
+            [
+                [[2, 2], [2, 2]],
+                [[4, 4], [4, 4]],
+                [[3, 3], [3, 3]],
+            ],
+        ),
     ],
 )
 def test_interpreter(name: str, output: str):
