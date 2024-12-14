@@ -1,4 +1,5 @@
 from copy import deepcopy
+import sys
 
 from generated.MyParser import MyParser
 from generated.MyParserVisitor import MyParserVisitor
@@ -65,7 +66,12 @@ class Interpreter(MyParserVisitor):
             print(str(self.visit(ctx.getChild(i))))
 
     def visitReturn(self, ctx: MyParser.ReturnContext):
-        return self.visitChildren(ctx)  # todo
+        if ctx.expression() is not None:
+            return_value = self.visit(ctx.expression())
+            if not isinstance(return_value, Int):
+                raise TypeError
+            sys.exit(return_value.value)
+        sys.exit()
 
     def visitBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
         a = self.visit(ctx.getChild(0))

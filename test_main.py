@@ -87,3 +87,8 @@ def test_interpreter(name: str, output: str):
     result = runner.invoke(app, ["run", f"tests/interpreter/{name}.txt"])
     assert result.exit_code == 0
     assert result.stdout == "\n".join(map(str, output)) + "\n"
+
+
+def test_interpreter_return():
+    result = runner.invoke(app, ["run", "tests/interpreter/return.txt"])
+    assert result.exit_code == 1
