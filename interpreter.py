@@ -7,6 +7,14 @@ from utils.memory import MemoryStack
 from utils.values import Int, Float, String, Vector
 
 
+class Break(Exception):
+    pass
+
+
+class Continue(Exception):
+    pass
+
+
 class Interpreter(MyParserVisitor):
     def __init__(self):
         self.memory_stack = MemoryStack()
@@ -36,7 +44,12 @@ class Interpreter(MyParserVisitor):
         while a <= b:
             self.memory_stack.put(variable, Int(a))
             a = a + 1  # to increment enumerateor and disregard changes inside the loop
-            self.visit(ctx.statement())
+            try:
+                self.visit(ctx.statement())
+            except Continue:
+                continue
+            except Break:
+                break
 
     def visitRange(self, ctx: MyParser.RangeContext):
         a = self.visit(ctx.expression(0))
@@ -47,7 +60,12 @@ class Interpreter(MyParserVisitor):
 
     def visitWhileLoop(self, ctx: MyParser.WhileLoopContext):
         while self.visit(ctx.comparison()):
-            self.visit(ctx.statement())
+            try:
+                self.visit(ctx.statement())
+            except Continue:
+                continue
+            except Break:
+                break
 
     def visitComparison(self, ctx: MyParser.ComparisonContext):
         a = self.visit(ctx.expression(0))
@@ -153,10 +171,10 @@ class Interpreter(MyParserVisitor):
             return vector
 
     def visitBreak(self, ctx: MyParser.BreakContext):
-        return self.visitChildren(ctx)  # todo
+        raise Break()
 
     def visitContinue(self, ctx: MyParser.ContinueContext):
-        return self.visitChildren(ctx)  # todo
+        raise Continue()
 
     def visitVector(self, ctx: MyParser.VectorContext):
         elements = [
