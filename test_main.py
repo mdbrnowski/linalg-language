@@ -81,6 +81,28 @@ def test_sem_errors(name: str, line_numbers: list[int], additional: str):
                 [[1, 1, 1]],
             ],
         ),
+        ("variables", [2, 1, 3, "OK", 6]),
+        ("while", [4, 3, 2, 1, 0]),
+        ("for", [1, 10, 2, 10, 3, 10, 4, 10]),
+        ("break_continue", [1, 2, 1, 2, 4] * 2),
+        (
+            "element_reference",
+            [
+                [1, 0],
+                0,
+                [[1, 2], [0, 1]],
+                [[0, 2], [0, 1]],
+                [[0, 0], [0, 1]],
+            ],
+        ),
+        (
+            "mat_operators",
+            [
+                [[2, 2], [2, 2]],
+                [[4, 4], [4, 4]],
+                [[3, 3], [3, 3]],
+            ],
+        ),
     ],
 )
 def test_interpreter(name: str, output: str):

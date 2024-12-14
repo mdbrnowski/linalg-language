@@ -1,0 +1,6 @@
+n = 4;
+for i = 1:n {
+    print i;
+    i = 10;
+    print i;
+}

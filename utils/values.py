@@ -108,7 +108,11 @@ class Vector(Value):
         if (
             len(
                 {
-                    (type(elem), elem.dims if isinstance(elem, Vector) else None)
+                    (
+                        (elem.dims, elem.primitive_type)
+                        if isinstance(elem, Vector)
+                        else type(elem)
+                    )
                     for elem in value
                 }
             )
@@ -118,11 +122,57 @@ class Vector(Value):
 
         if isinstance(value[0], Vector):
             self.dims = (len(value), *value[0].dims)
+            self.primitive_type = value[0].primitive_type
         else:
             self.dims = (len(value),)
+            self.primitive_type = type(value[0])
 
     def __str__(self):
         return "[" + ", ".join(str(elem) for elem in self.value) + "]"
+
+    def mat_add(self, other):
+        if isinstance(other, Vector):
+            rows = []
+            for elem, other_elem in zip(self.value, other.value):
+                if isinstance(elem, Vector):
+                    rows.append(elem.mat_add(other_elem))
+                else:
+                    rows.append(elem + other_elem)
+            return Vector(rows)
+        raise TypeError()
+
+    def mat_sub(self, other):
+        if isinstance(other, Vector):
+            rows = []
+            for elem, other_elem in zip(self.value, other.value):
+                if isinstance(elem, Vector):
+                    rows.append(elem.mat_sub(other_elem))
+                else:
+                    rows.append(elem - other_elem)
+            return Vector(rows)
+        raise TypeError()
+
+    def mat_mul(self, other):
+        if isinstance(other, Vector):
+            rows = []
+            for elem, other_elem in zip(self.value, other.value):
+                if isinstance(elem, Vector):
+                    rows.append(elem.mat_mul(other_elem))
+                else:
+                    rows.append(elem * other_elem)
+            return Vector(rows)
+        raise TypeError()
+
+    def mat_truediv(self, other):
+        if isinstance(other, Vector):
+            rows = []
+            for elem, other_elem in zip(self.value, other.value):
+                if isinstance(elem, Vector):
+                    rows.append(elem.mat_truediv(other_elem))
+                else:
+                    rows.append(elem / other_elem)
+            return Vector(rows)
+        raise TypeError()
 
     def transpose(self):
         if len(self.dims) != 2:
