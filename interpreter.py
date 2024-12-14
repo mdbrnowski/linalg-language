@@ -31,13 +31,23 @@ class Interpreter(MyParserVisitor):
         return self.visit(ctx.statement())
 
     def visitForLoop(self, ctx: MyParser.ForLoopContext):
-        return self.visitChildren(ctx)  # todo
+        a, b = self.visit(ctx.range_())
+        variable = ctx.id_().getText()
+        while a <= b:
+            self.memory_stack.put(variable, a)
+            a = a + 1  # to increment enumerateor and disregard changes inside the loop
+            self.visit(ctx.statement())
 
     def visitRange(self, ctx: MyParser.RangeContext):
-        return self.visitChildren(ctx)  # todo
+        a = self.visit(ctx.expression(0))
+        b = self.visit(ctx.expression(1))
+        if {type(a), type(b)} != {Int}:
+            raise TypeError
+        return (a.value, b.value)
 
     def visitWhileLoop(self, ctx: MyParser.WhileLoopContext):
-        return self.visitChildren(ctx)  # todo
+        while self.visit(ctx.comparison()):
+            self.visit(ctx.statement())
 
     def visitComparison(self, ctx: MyParser.ComparisonContext):
         a = self.visit(ctx.expression(0))
