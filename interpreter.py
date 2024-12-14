@@ -1,5 +1,5 @@
-from copy import deepcopy
 import sys
+from copy import deepcopy
 
 from generated.MyParser import MyParser
 from generated.MyParserVisitor import MyParserVisitor
@@ -7,13 +7,7 @@ from utils.values import Int, Float, String, Vector
 
 
 class Interpreter(MyParserVisitor):
-    def visitProgram(self, ctx: MyParser.ProgramContext):
-        return self.visitChildren(ctx)  # todo
-
     def visitScopeStatement(self, ctx: MyParser.ScopeStatementContext):
-        return self.visitChildren(ctx)  # todo
-
-    def visitSimpleStatement(self, ctx: MyParser.SimpleStatementContext):
         return self.visitChildren(ctx)  # todo
 
     def visitIfThenElse(self, ctx: MyParser.IfThenElseContext):
