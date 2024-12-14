@@ -81,6 +81,7 @@ def test_sem_errors(name: str, line_numbers: list[int], additional: str):
                 [[1, 1, 1]],
             ],
         ),
+        ("variables", [2, 1, 3, "OK", 6]),
     ],
 )
 def test_interpreter(name: str, output: str):

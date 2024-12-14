@@ -3,18 +3,25 @@ from copy import deepcopy
 
 from generated.MyParser import MyParser
 from generated.MyParserVisitor import MyParserVisitor
+from utils.memory import MemoryStack
 from utils.values import Int, Float, String, Vector
 
 
 class Interpreter(MyParserVisitor):
+    def __init__(self):
+        self.memory_stack = MemoryStack()
+        self.memory_stack.push_memory()
+
     def visitScopeStatement(self, ctx: MyParser.ScopeStatementContext):
-        return self.visitChildren(ctx)  # todo
+        self.memory_stack.push_memory()
+        self.visitChildren(ctx)
+        self.memory_stack.pop_memory()
 
     def visitIfThenElse(self, ctx: MyParser.IfThenElseContext):
         condition = self.visit(ctx.if_())
         if condition:
             return self.visit(ctx.then())
-        elif ctx.else_() is not None:
+        elif ctx.else_():
             return self.visit(ctx.else_())
 
     def visitIf(self, ctx: MyParser.IfContext):
@@ -50,17 +57,36 @@ class Interpreter(MyParserVisitor):
                 return a >= b
 
     def visitSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
-        return self.visitChildren(ctx)  # todo
+        if ctx.id_():
+            self.visitChildren(ctx)
+            self.memory_stack.put(ctx.id_().getText(), self.visit(ctx.expression()))
+        else:
+            pass  # todo
 
     def visitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
-        return self.visitChildren(ctx)  # todo
+        if ctx.id_():
+            self.visitChildren(ctx)
+            old_value = self.memory_stack.get(ctx.id_().getText())
+            new_value = self.visit(ctx.expression())
+            match ctx.getChild(1).symbol.type:
+                case MyParser.ASSIGN_PLUS:
+                    new_value = old_value + new_value
+                case MyParser.ASSIGN_MINUS:
+                    new_value = old_value - new_value
+                case MyParser.ASSIGN_MULTIPLY:
+                    new_value = old_value * new_value
+                case MyParser.ASSIGN_DIVIDE:
+                    new_value = old_value / new_value
+            self.memory_stack.put(ctx.id_().getText(), new_value)
+        else:
+            pass  # todo
 
     def visitPrint(self, ctx: MyParser.PrintContext):
         for i in range(ctx.getChildCount() // 2):
             print(str(self.visit(ctx.expression(i))))
 
     def visitReturn(self, ctx: MyParser.ReturnContext):
-        if ctx.expression() is not None:
+        if ctx.expression():
             return_value = self.visit(ctx.expression())
             if not isinstance(return_value, Int):
                 raise TypeError
@@ -132,7 +158,7 @@ class Interpreter(MyParserVisitor):
         return self.visitChildren(ctx)  # todo
 
     def visitId(self, ctx: MyParser.IdContext):
-        return self.visitChildren(ctx)  # todo
+        return self.memory_stack.get(ctx.getText())
 
     def visitInt(self, ctx: MyParser.IntContext):
         return Int(ctx.getText())
@@ -141,4 +167,4 @@ class Interpreter(MyParserVisitor):
         return Float(ctx.getText())
 
     def visitString(self, ctx: MyParser.StringContext):
-        return String(ctx.getText())
+        return String(ctx.getText()[1:-1])  # without quotes
