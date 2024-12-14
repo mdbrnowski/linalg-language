@@ -41,9 +41,8 @@ class Interpreter(MyParserVisitor):
     def visitForLoop(self, ctx: MyParser.ForLoopContext):
         a, b = self.visit(ctx.range_())
         variable = ctx.id_().getText()
-        while a <= b:
-            self.memory_stack.put(variable, Int(a))
-            a = a + 1  # to increment enumerateor and disregard changes inside the loop
+        for i in range(a, b + 1):
+            self.memory_stack.put(variable, Int(i))
             try:
                 self.visit(ctx.statement())
             except Continue:
