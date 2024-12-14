@@ -34,7 +34,7 @@ class Interpreter(MyParserVisitor):
         a, b = self.visit(ctx.range_())
         variable = ctx.id_().getText()
         while a <= b:
-            self.memory_stack.put(variable, a)
+            self.memory_stack.put(variable, Int(a))
             a = a + 1  # to increment enumerateor and disregard changes inside the loop
             self.visit(ctx.statement())
 
