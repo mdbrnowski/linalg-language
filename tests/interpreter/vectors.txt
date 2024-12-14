@@ -1,0 +1,7 @@
+print [1, 2, 3];
+print eye(3);
+print zeros(2);
+print ones(1, 2);
+print zeros(3, 2, 1);
+
+print ones(3, 1)';

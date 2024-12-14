@@ -53,7 +53,7 @@ whileLoop
     ;
 
 comparison
-    : expression (LE | GE | EQ | NE | LEQ | GEQ) expression
+    : expression (EQ | NEQ | LT | GT | LEQ | GEQ) expression
     ;
 
 assignment
