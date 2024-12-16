@@ -83,7 +83,7 @@ class SemanticAnalyser(MyParserVisitor):
                 ctx.parser.notifyErrorListeners(
                     "Incompatible types in an assignment", ctx.getChild(1).getSymbol()
                 )
-        else:  ## a[0] = 1
+        else:  # a[0] = 1
             reference = self.visit(ctx.elementReference())
             new_type = self.visit(ctx.expression())
             if isinstance(new_type, Int):
@@ -97,7 +97,7 @@ class SemanticAnalyser(MyParserVisitor):
         if ctx.id_():  # a = 1
             old_type = self.visit(ctx.id_())
             new_type = self.visit(ctx.expression())
-        else:  ## a[0] = 1
+        else:  # a[0] = 1
             old_type = self.visit(ctx.elementReference())
             new_type = self.visit(ctx.expression())
         try:
@@ -194,11 +194,9 @@ class SemanticAnalyser(MyParserVisitor):
             if not all(isinstance(dim, Int) for dim in dims):
                 ctx.parser.notifyErrorListeners(
                     "Matrix dimentions must be integers", ctx.getChild(0).getSymbol()
-                )  # todo: add more specific symbol
+                )
                 return
-            return Vector(
-                tuple(dim.value for dim in dims), Int()
-            )  # todo: return Int(0) or Int(1)
+            return Vector(tuple(dim.value for dim in dims), Int())
 
     def visitBreak(self, ctx: MyParser.BreakContext):
         if self.nested_loop_counter == 0:
