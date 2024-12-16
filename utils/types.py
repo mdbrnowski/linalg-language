@@ -1,6 +1,18 @@
 class Type:
     def __eq__(self, other):
-        return type(self) is type(other)
+        raise TypeError()
+
+    def __lt__(self, other):
+        raise TypeError()
+
+    def __le__(self, other):
+        raise TypeError()
+
+    def __gt__(self, other):
+        raise TypeError()
+
+    def __ge__(self, other):
+        raise TypeError()
 
     def mat_add(self, other):
         raise TypeError()
@@ -24,6 +36,26 @@ class Int(Type):
             self.value = int(value)
         else:
             self.value = None
+
+    def __eq__(self, other):
+        if not isinstance(other, Int) and not isinstance(other, Float):
+            raise TypeError()
+
+    def __lt__(self, other):
+        if not isinstance(other, Int) and not isinstance(other, Float):
+            raise TypeError()
+
+    def __le__(self, other):
+        if not isinstance(other, Int) and not isinstance(other, Float):
+            raise TypeError()
+
+    def __gt__(self, other):
+        if not isinstance(other, Int) and not isinstance(other, Float):
+            raise TypeError()
+
+    def __ge__(self, other):
+        if not isinstance(other, Int) and not isinstance(other, Float):
+            raise TypeError()
 
     def __add__(self, other):
         if isinstance(other, Int):
@@ -56,6 +88,26 @@ class Int(Type):
 
 
 class Float(Type):
+    def __eq__(self, other):
+        if not isinstance(other, Float) and not isinstance(other, Int):
+            raise TypeError()
+
+    def __lt__(self, other):
+        if not isinstance(other, Float) and not isinstance(other, Int):
+            raise TypeError()
+
+    def __le__(self, other):
+        if not isinstance(other, Float) and not isinstance(other, Int):
+            raise TypeError()
+
+    def __gt__(self, other):
+        if not isinstance(other, Float) and not isinstance(other, Int):
+            raise TypeError()
+
+    def __ge__(self, other):
+        if not isinstance(other, Float) and not isinstance(other, Int):
+            raise TypeError()
+
     def __add__(self, other):
         if isinstance(other, Float) or isinstance(other, Int):
             return Float()
@@ -81,6 +133,10 @@ class Float(Type):
 
 
 class String(Type):
+    def __eq__(self, other):
+        if not isinstance(other, String):
+            raise TypeError()
+
     def __add__(self, other):
         if isinstance(other, String):
             return String()
@@ -98,11 +154,24 @@ class Vector(Type):
         self.primitive_type = primitive_type
 
     def __eq__(self, other):
-        return (
-            isinstance(other, Vector)
-            and self.dims == other.dims
-            and type(self.primitive_type) is type(other.primitive_type)
-        )
+        if not same_type(self, other):
+            raise TypeError()
+
+    def __lt__(self, other):
+        if not same_type(self, other):
+            raise TypeError()
+
+    def __le__(self, other):
+        if not same_type(self, other):
+            raise TypeError()
+
+    def __gt__(self, other):
+        if not same_type(self, other):
+            raise TypeError()
+
+    def __ge__(self, other):
+        if not same_type(self, other):
+            raise TypeError()
 
     def _mat_op(self, other, op):
         new_dims = []
@@ -129,3 +198,13 @@ class Vector(Type):
         if len(self.dims) != 2:
             raise TypeError
         return Vector(reversed(self.dims), self.primitive_type)
+
+
+def same_type(a: Type, b: Type):
+    if isinstance(a, Vector):
+        return (
+            isinstance(b, Vector)
+            and a.dims == b.dims
+            and same_type(a.primitive_type, b.primitive_type)
+        )
+    return type(a) is type(b)

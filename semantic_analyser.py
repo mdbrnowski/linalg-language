@@ -2,9 +2,8 @@ from copy import deepcopy
 
 from generated.MyParser import MyParser
 from generated.MyParserVisitor import MyParserVisitor
-
-from utils.types import Int, Float, String, Vector
 from utils.memory import MemoryStack
+from utils.types import Int, Float, String, Vector, same_type
 
 
 class SemanticAnalyser(MyParserVisitor):
@@ -49,14 +48,33 @@ class SemanticAnalyser(MyParserVisitor):
         self.nested_loop_counter -= 1
 
     def visitComparison(self, ctx: MyParser.ComparisonContext):
-        return self.visitChildren(ctx)  # todo
+        a = self.visit(ctx.expression(0))
+        b = self.visit(ctx.expression(1))
+        try:
+            match ctx.getChild(1).symbol.type:
+                case MyParser.EQ:
+                    return a == b
+                case MyParser.NEQ:
+                    return a != b
+                case MyParser.LT:
+                    return a < b
+                case MyParser.LEQ:
+                    return a <= b
+                case MyParser.GT:
+                    return a > b
+                case MyParser.GEQ:
+                    return a >= b
+        except TypeError:
+            ctx.parser.notifyErrorListeners(
+                "Incompatible types in a comparison", ctx.getChild(1).getSymbol()
+            )
 
     def visitSimpleAssignment(self, ctx: MyParser.SimpleAssignmentContext):
         if ctx.id_():  # a = 1
             variable = ctx.id_().getText()
             new_type = self.visit(ctx.expression())
             if self.memory_stack.get(variable) is None or (
-                self.memory_stack.get(variable) == new_type  # comparing types
+                same_type(self.memory_stack.get(variable), new_type)
             ):
                 self.memory_stack.put(variable, new_type)
             else:
@@ -158,7 +176,7 @@ class SemanticAnalyser(MyParserVisitor):
             self.visit(ctx.expression(i)) for i in range(ctx.getChildCount() // 2)
         ]
         for i in range(1, len(elements)):
-            if elements[i] != elements[i - 1]:  # comparing types
+            if not same_type(elements[i], elements[i - 1]):
                 wrong_token = ctx.COMMA(i) or ctx.CLOSE_BRACKET_SQUARE()
                 ctx.parser.notifyErrorListeners(
                     "Inconsistent types in a vector", wrong_token.getSymbol()
