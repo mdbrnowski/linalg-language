@@ -56,7 +56,7 @@ def test_ast(n: int):
     ],
 )
 def test_sem_errors(name: str, line_numbers: list[int], additional: str):
-    result = runner.invoke(app, ["sem", f"tests/semantic/input_{name}.txt"])
+    result = runner.invoke(app, ["sem", f"tests/semantic/{name}.txt"])
     assert result.exit_code == 0
     for ln in line_numbers:
         assert f"line {ln}" in result.stdout
