@@ -115,3 +115,18 @@ def test_interpreter(name: str, output: str):
 def test_interpreter_return():
     result = runner.invoke(app, ["run", "tests/interpreter/return.txt"])
     assert result.exit_code == 1
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "parser/input_1.txt",
+        "parser/input_2.txt",
+        "ast/input_1.txt",
+        "ast/input_2.txt",
+        "ast/input_3.txt",
+    ],
+)
+def test_all_on_previous_tests(name: str):  # run interpreter on parser tests and AST tests
+    result = runner.invoke(app, ["run", f"tests/{name}"])
+    assert result.exit_code == 0
