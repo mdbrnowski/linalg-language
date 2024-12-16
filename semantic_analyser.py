@@ -82,10 +82,47 @@ class SemanticAnalyser(MyParserVisitor):
                     "Incompatible types in an assignment", ctx.getChild(1).getSymbol()
                 )
         else:  ## a[0] = 1
-            pass  # todo
+            reference = self.visit(ctx.elementReference())
+            new_type = self.visit(ctx.expression())
+            if not same_type(reference, new_type):
+                ctx.parser.notifyErrorListeners(
+                    "Incompatible types in an assignment", ctx.getChild(1).getSymbol()
+                )
 
     def visitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
-        return self.visitChildren(ctx)  # todo
+        if ctx.id_():  # a = 1
+            old_type = self.visit(ctx.id_())
+            new_type = self.visit(ctx.expression())
+        else:  ## a[0] = 1
+            old_type = self.visit(ctx.elementReference())
+            new_type = self.visit(ctx.expression())
+        try:
+            match ctx.getChild(1).symbol.type:
+                case MyParser.ASSIGN_PLUS:
+                    if not same_type(old_type, old_type + new_type):
+                        raise TypeError
+                case MyParser.ASSIGN_MINUS:
+                    if not same_type(old_type, old_type - new_type):
+                        raise TypeError
+                case MyParser.ASSIGN_MULTIPLY:
+                    if not same_type(old_type, old_type * new_type):
+                        raise TypeError
+                case MyParser.ASSIGN_DIVIDE:
+                    if not same_type(old_type, old_type / new_type):
+                        raise TypeError
+        except TypeError:
+            ctx.parser.notifyErrorListeners(
+                "Incompatible types in a compound assignment",
+                ctx.getChild(1).getSymbol(),
+            )
+
+    def visitReturn(self, ctx: MyParser.ReturnContext):
+        if ctx.expression():
+            return_type = self.visit(ctx.expression())
+            if not isinstance(return_type, Int):
+                ctx.parser.notifyErrorListeners(
+                    "Return type must be an integer", ctx.RETURN().getSymbol()
+                )
 
     def visitBinaryExpression(self, ctx: MyParser.BinaryExpressionContext):
         a = self.visit(ctx.expression(0))
