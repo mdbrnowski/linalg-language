@@ -87,9 +87,8 @@ def run(filename: str):
 
     tree = parser.program()
     if parser.getNumberOfSyntaxErrors() == 0:
-        # todo: Fix SemanticListener
-        # listener = SemanticListener()
-        # ParseTreeWalker().walk(listener, tree)
+        visitor = SemanticAnalyser()
+        visitor.visit(tree)
         if parser.getNumberOfSyntaxErrors() == 0:
             visitor = Interpreter()
             visitor.visit(tree)
