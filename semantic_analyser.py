@@ -73,6 +73,8 @@ class SemanticAnalyser(MyParserVisitor):
         if ctx.id_():  # a = 1
             variable = ctx.id_().getText()
             new_type = self.visit(ctx.expression())
+            if isinstance(new_type, Int):
+                new_type.value = None
             if self.memory_stack.get(variable) is None or (
                 same_type(self.memory_stack.get(variable), new_type)
             ):
@@ -84,6 +86,8 @@ class SemanticAnalyser(MyParserVisitor):
         else:  ## a[0] = 1
             reference = self.visit(ctx.elementReference())
             new_type = self.visit(ctx.expression())
+            if isinstance(new_type, Int):
+                new_type.value = None
             if not same_type(reference, new_type):
                 ctx.parser.notifyErrorListeners(
                     "Incompatible types in an assignment", ctx.getChild(1).getSymbol()
