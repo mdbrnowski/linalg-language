@@ -75,7 +75,7 @@ class Int(Type):
         if isinstance(other, Int):
             if self.value is not None and other.value is not None:
                 return Int(self.value * other.value)
-            return Int(self.value * other.value)
+            return Int()
         raise TypeError()
 
     def __truediv__(self, other):
