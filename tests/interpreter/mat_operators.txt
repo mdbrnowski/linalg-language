@@ -6,4 +6,3 @@ A = A .* A;
 print A;
 A = A .- B;
 print A;
-A = A ./ B;

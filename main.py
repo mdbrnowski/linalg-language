@@ -7,7 +7,7 @@ from ast_listener import ASTListener
 from generated.MyLexer import MyLexer
 from generated.MyParser import MyParser
 from interpreter import Interpreter
-from semantic_listener import SemanticListener
+from semantic_analyser import SemanticAnalyser
 
 app = typer.Typer(no_args_is_help=True)
 err_console = Console(stderr=True)
@@ -72,8 +72,8 @@ def sem(filename: str):
 
     tree = parser.program()
     if parser.getNumberOfSyntaxErrors() == 0:
-        listener = SemanticListener()
-        ParseTreeWalker().walk(listener, tree)
+        visitor = SemanticAnalyser()
+        visitor.visit(tree)
 
 
 @app.command()
@@ -87,9 +87,8 @@ def run(filename: str):
 
     tree = parser.program()
     if parser.getNumberOfSyntaxErrors() == 0:
-        # todo: Fix SemanticListener
-        # listener = SemanticListener()
-        # ParseTreeWalker().walk(listener, tree)
+        visitor = SemanticAnalyser()
+        visitor.visit(tree)
         if parser.getNumberOfSyntaxErrors() == 0:
             visitor = Interpreter()
             visitor.visit(tree)
