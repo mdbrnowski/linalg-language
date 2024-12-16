@@ -127,6 +127,8 @@ def test_interpreter_return():
         "ast/input_3.txt",
     ],
 )
-def test_all_on_previous_tests(name: str):  # run interpreter on parser tests and AST tests
+def test_all_on_previous_tests(
+    name: str,
+):  # run interpreter on parser tests and AST tests
     result = runner.invoke(app, ["run", f"tests/{name}"])
     assert result.exit_code == 0
