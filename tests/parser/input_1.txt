@@ -18,8 +18,8 @@ string_1 = "#Hello!";
 
 print H';
 
-a = 1;
-b = 2;
+a = 1.0;
+b = 2.0;
 
 a += b;
 a /= b;
