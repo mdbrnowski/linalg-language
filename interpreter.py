@@ -4,7 +4,7 @@ from copy import deepcopy
 from generated.MyParser import MyParser
 from generated.MyParserVisitor import MyParserVisitor
 from utils.memory import MemoryStack
-from utils.values import Value, Int, Float, String, Vector
+from utils.values import Int, Float, String, Vector
 
 
 class Break(Exception):
@@ -13,13 +13,6 @@ class Break(Exception):
 
 class Continue(Exception):
     pass
-
-
-def not_same_type(a: Value, b: Value):
-    return type(a) is not type(b) or (
-        isinstance(a, Vector)
-        and (a.dims != b.dims or a.primitive_type != b.primitive_type)
-    )
 
 
 class Interpreter(MyParserVisitor):
@@ -60,8 +53,6 @@ class Interpreter(MyParserVisitor):
     def visitRange(self, ctx: MyParser.RangeContext):
         a = self.visit(ctx.expression(0))
         b = self.visit(ctx.expression(1))
-        if {type(a), type(b)} != {Int}:
-            raise TypeError
         return (a.value, b.value)
 
     def visitWhileLoop(self, ctx: MyParser.WhileLoopContext):
@@ -96,8 +87,6 @@ class Interpreter(MyParserVisitor):
         else:  # a[0] = 1
             ref_value = self.visit(ctx.elementReference())
             new_value = self.visit(ctx.expression())
-            if not_same_type(ref_value, new_value):
-                raise TypeError
             ref_value.value = new_value.value
 
     def visitCompoundAssignment(self, ctx: MyParser.CompoundAssignmentContext):
@@ -117,8 +106,6 @@ class Interpreter(MyParserVisitor):
         else:  # a[0] += 1
             ref_value = self.visit(ctx.elementReference())
             new_value = self.visit(ctx.expression())
-            if not_same_type(ref_value, new_value):
-                raise TypeError
             match ctx.getChild(1).symbol.type:
                 case MyParser.ASSIGN_PLUS:
                     new_value = ref_value + new_value
@@ -137,8 +124,6 @@ class Interpreter(MyParserVisitor):
     def visitReturn(self, ctx: MyParser.ReturnContext):
         if ctx.expression():
             return_value = self.visit(ctx.expression())
-            if not isinstance(return_value, Int):
-                raise TypeError
             sys.exit(return_value.value)
         sys.exit()
 
@@ -167,10 +152,7 @@ class Interpreter(MyParserVisitor):
         return self.visit(ctx.expression())
 
     def visitTransposeExpression(self, ctx: MyParser.TransposeExpressionContext):
-        vector = self.visit(ctx.expression())
-        if not isinstance(vector, Vector):
-            raise TypeError
-        return vector.transpose()
+        return self.visit(ctx.expression()).transpose()
 
     def visitMinusExpression(self, ctx: MyParser.MinusExpressionContext):
         return -self.visit(ctx.expression())
@@ -179,8 +161,6 @@ class Interpreter(MyParserVisitor):
         fname = ctx.getChild(0).symbol.type
         if fname == MyParser.EYE:
             dim = self.visit(ctx.expression(0))
-            if not isinstance(dim, Int):
-                raise TypeError
             rows = [
                 Vector([Int(i == j) for j in range(dim.value)])
                 for i in range(dim.value)
@@ -191,8 +171,6 @@ class Interpreter(MyParserVisitor):
                 self.visit(ctx.expression(i))
                 for i in range(ctx.getChildCount() // 2 - 1)
             ]
-            if {type(dim) for dim in dims} != {Int}:
-                raise TypeError
             vector = {MyParser.ZEROS: Int(0), MyParser.ONES: Int(1)}[fname]
             for dim in reversed(dims):
                 vector = Vector([deepcopy(vector) for _ in range(dim.value)])
@@ -214,12 +192,8 @@ class Interpreter(MyParserVisitor):
         indices = [
             self.visit(ctx.expression(i)) for i in range(ctx.getChildCount() // 2 - 1)
         ]
-        if {type(idx) for idx in indices} != {Int}:
-            raise TypeError
         result = self.visit(ctx.id_())
         for idx in indices:
-            if not isinstance(result, Vector):
-                raise TypeError
             result = result.value[idx.value]
         return result
 
