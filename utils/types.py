@@ -62,6 +62,8 @@ class Int(Type):
             if self.value is not None and other.value is not None:
                 return Int(self.value + other.value)
             return Int()
+        if isinstance(other, Float):
+            return Float()
         raise TypeError()
 
     def __sub__(self, other):
@@ -69,6 +71,8 @@ class Int(Type):
             if self.value is not None and other.value is not None:
                 return Int(self.value - other.value)
             return Int()
+        if isinstance(other, Float):
+            return Float()
         raise TypeError()
 
     def __mul__(self, other):
@@ -76,6 +80,8 @@ class Int(Type):
             if self.value is not None and other.value is not None:
                 return Int(self.value * other.value)
             return Int()
+        if isinstance(other, Float):
+            return Float()
         raise TypeError()
 
     def __truediv__(self, other):
@@ -84,7 +90,9 @@ class Int(Type):
         raise TypeError()
 
     def __neg__(self):
-        return Int(-self.value)
+        if self.value is not None:
+            return Int(-self.value)
+        return Int()
 
 
 class Float(Type):
@@ -176,11 +184,11 @@ class Vector(Type):
     def _mat_op(self, other, op):
         new_dims = []
         for self_dim, other_dim in zip(self.dims, other.dims):
-            new_dim = self_dim or other_dim
+            new_dim = self_dim or other_dim  # handle None
             if new_dim != self_dim or new_dim != other_dim:
                 raise TypeError
             new_dims.append(new_dim)
-        return Vector(new_dims, op(self.primitive_type, other.primitive_type))
+        return Vector(tuple(new_dims), op(self.primitive_type, other.primitive_type))
 
     def mat_add(self, other):
         return self._mat_op(other, lambda x, y: x + y)
