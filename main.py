@@ -1,4 +1,6 @@
 #!.venv/bin/python3
+import sys
+
 import typer
 from antlr4 import CommonTokenStream, InputStream, ParseTreeWalker
 from rich.console import Console
@@ -90,8 +92,12 @@ def run(filename: str):
         visitor = SemanticAnalyser()
         visitor.visit(tree)
         if parser.getNumberOfSyntaxErrors() == 0:
-            visitor = Interpreter()
-            visitor.visit(tree)
+            try:
+                visitor = Interpreter()
+                visitor.visit(tree)
+            except Exception:
+                err_console.print("[bold red]runtime error")
+                sys.exit(1)
 
 
 if __name__ == "__main__":
